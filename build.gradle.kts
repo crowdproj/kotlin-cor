@@ -63,7 +63,7 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/crowdproj/kotlin-cor")
             credentials {
-                username = System.getenv("GITHUB_USERNAME")
+                username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
