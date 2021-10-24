@@ -8,7 +8,6 @@ import kotlin.test.Test
 class CorBaseTest {
     @Test
     fun createCor() {
-
     }
 
     companion object {
@@ -31,7 +30,6 @@ class CorBaseTest {
                 ) {
                     some += 4
                 }
-
             }
 
             parallel {
