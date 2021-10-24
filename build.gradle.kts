@@ -1,10 +1,11 @@
 plugins {
     kotlin("multiplatform")
     `maven-publish`
+    id("org.jetbrains.dokka")
 }
 
 group = "com.crowdproj.kotlin.cor"
-version = "0.2.0"
+version = "0.2.1"
 
 repositories {
     mavenCentral()
@@ -57,6 +58,15 @@ kotlin {
     }
 }
 
+val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
+
+val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+    dependsOn(dokkaHtml)
+    group = "publishing"
+    archiveClassifier.set("javadoc")
+    from(dokkaHtml.outputDirectory)
+}
+
 publishing {
     repositories {
         maven {
@@ -67,5 +77,8 @@ publishing {
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
+    }
+    publications.withType<MavenPublication> {
+        artifact(javadocJar)
     }
 }

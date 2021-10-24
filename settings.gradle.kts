@@ -6,5 +6,6 @@ pluginManagement {
 
         kotlin("multiplatform") version kotlinVersion
         `maven-publish`
+        id("org.jetbrains.dokka") version kotlinVersion
     }
 }
