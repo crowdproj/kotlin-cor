@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.crowdproj.kotlin.cor"
-version = "0.2.2"
+version = "0.2.3"
 
 repositories {
     mavenCentral()
@@ -13,15 +13,7 @@ repositories {
 
 kotlin {
     js {
-        browser {
-            testTask {
-                useKarma {
-                    useFirefox()
-                    useChrome()
-                    useSafari()
-                }
-            }
-        }
+//        browser {}
         nodejs()
     }
     jvm {
