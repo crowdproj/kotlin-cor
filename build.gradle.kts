@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform")
+    `maven-publish`
 }
 
 group = "com.crowdproj.kotlin.cor"
@@ -51,6 +52,19 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
+            }
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/crowdproj/kotlin-cor")
+            credentials {
+                username = System.getenv("GITHUB_USERNAME")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
