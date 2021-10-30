@@ -5,6 +5,7 @@ import com.crowdproj.kotlin.cor.ICorExec
 import com.crowdproj.kotlin.cor.ICorWorker
 import com.crowdproj.kotlin.cor.ICorWorkerDsl
 import com.crowdproj.kotlin.cor.CorDslMarker
+import com.crowdproj.kotlin.cor.base.BaseCorWorkerDsl
 
 @CorDslMarker
 fun <T> ICorChainDsl<T>.worker(
@@ -22,11 +23,11 @@ fun <T> ICorChainDsl<T>.worker(
     function: suspend T.() -> Unit
 ) {
     add(
-        CorWorkerDsl<T>(
-            title = title,
-            description = description,
-            blockHandle = function
-        )
+        CorWorkerDsl<T>().apply {
+            this.title = title
+            this.description = description
+            this.handle(function)
+        }
     )
 }
 
@@ -43,13 +44,7 @@ class CorWorker<T>(
 }
 
 @CorDslMarker
-class CorWorkerDsl<T>(
-    override var title: String = "",
-    override var description: String = "",
-    private var blockOn: suspend T.() -> Boolean = { true },
-    private var blockHandle: suspend T.() -> Unit = {},
-    private var blockExcept: suspend T.(e: Throwable) -> Unit = { e: Throwable -> throw e },
-) : ICorWorkerDsl<T> {
+class CorWorkerDsl<T>() : BaseCorWorkerDsl<T>() {
 
     override fun build(): ICorExec<T> = CorWorker<T>(
         title = title,

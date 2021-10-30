@@ -4,6 +4,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import com.crowdproj.kotlin.cor.*
 import com.crowdproj.kotlin.cor.CorDslMarker
+import com.crowdproj.kotlin.cor.base.BaseCorChain
+import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
 
 @CorDslMarker
 fun <T> ICorChainDsl<T>.parallel(function: CorParallelDsl<T>.() -> Unit) {
@@ -12,14 +14,16 @@ fun <T> ICorChainDsl<T>.parallel(function: CorParallelDsl<T>.() -> Unit) {
 
 class CorParallel<T>(
     private val execs: List<ICorExec<T>>,
-    override val title: String,
-    override val description: String = "",
-    private val blockOn: suspend T.() -> Boolean = { true },
-    private val blockExcept: suspend T.(Throwable) -> Unit = {},
-) : ICorWorker<T> {
-
-    override suspend fun on(context: T): Boolean = blockOn(context)
-    override suspend fun except(context: T, e: Throwable) = blockExcept(context, e)
+    title: String,
+    description: String = "",
+    blockOn: suspend T.() -> Boolean = { true },
+    blockExcept: suspend T.(Throwable) -> Unit = {},
+) : BaseCorChain<T>(
+    title = title,
+    description = description,
+    blockOn = blockOn,
+    blockExcept = blockExcept
+) {
 
     override suspend fun handle(context: T): Unit = coroutineScope {
         execs
@@ -30,30 +34,12 @@ class CorParallel<T>(
 }
 
 @CorDslMarker
-class CorParallelDsl<T>(
-    override var title: String = "",
-    override var description: String = "",
-    private val workers: MutableList<ICorExecDsl<T>> = mutableListOf(),
-    private var blockOn: suspend T.() -> Boolean = { true },
-    private var blockExcept: suspend T.(e: Throwable) -> Unit = { e: Throwable -> throw e }
-): ICorChainDsl<T>, ICorHandlerDsl<T> {
-    override fun build(): ICorExec<T> = CorParallel<T>(
+class CorParallelDsl<T>(): BaseCorChainDsl<T>() {
+    override fun build(): ICorExec<T> = CorParallel(
         title = title,
         description = description,
         execs = workers.map { it.build() }.toList(),
         blockOn = blockOn,
         blockExcept = blockExcept
     )
-
-    override fun add(worker: ICorExecDsl<T>) {
-        workers.add(worker)
-    }
-
-    override fun on(function: suspend T.() -> Boolean) {
-        blockOn = function
-    }
-
-    override fun except(function: suspend T.(e: Throwable) -> Unit) {
-        blockExcept = function
-    }
 }
