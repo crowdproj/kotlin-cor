@@ -87,8 +87,8 @@ class CorJvmTest {
 
         runBlocking { chain.exec(ctx) }
 
-        assertNotEquals(CorStatuses.FAILING, ctx.status)
-        assertEquals(0, ctx.some)
+        assertEquals(CorStatuses.FAILING, ctx.status)
+        assertEquals(1, ctx.some)
     }
 
     @Test
@@ -100,7 +100,7 @@ class CorJvmTest {
         runBlocking { chain.exec(ctx) }
 
         assertEquals(CorStatuses.FAILING, ctx.status)
-        assertEquals(7, ctx.some)
+        assertEquals(2, ctx.some)
     }
 
     @Test
@@ -112,7 +112,7 @@ class CorJvmTest {
         runBlocking { chain.exec(ctx) }
 
         assertEquals(CorStatuses.FAILING, ctx.status)
-        assertEquals(7, ctx.some)
+        assertEquals(2, ctx.some)
     }
 
 }

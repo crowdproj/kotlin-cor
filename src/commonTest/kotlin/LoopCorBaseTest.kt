@@ -19,7 +19,7 @@ class LoopCorBaseTest {
                 on { true }
                 check { some < 5 }
                 except { status = CorStatuses.FAILING }
-                restarts { 5L }
+                maxEx { 5L }
                 worker(title = "Increment some") {
                     some++
                     println("=$some")
@@ -43,7 +43,7 @@ class LoopCorBaseTest {
                 on { true }
                 check { some < 5 }
                 except { status = CorStatuses.FAILING }
-                restarts { 5L }
+                maxEx { 5L }
                 worker(title = "Increment some") {
                     some++
                     println("=$some")
@@ -63,7 +63,7 @@ class LoopCorBaseTest {
             loopWhile {
                 check { some < 10 } // выполняется пока true
                 except { status = CorStatuses.FAILING }
-                restarts { 5L } // возможное количество исключений
+                maxEx { 5L } // возможное количество исключений
                 failed { some-- }
                 worker(title = "Increment some") {
                     some++
@@ -76,7 +76,7 @@ class LoopCorBaseTest {
             loopUntil {
                 check { some < 10 }
                 except { status = CorStatuses.FAILING }
-                restarts { 5L }
+                maxEx { 5L }
                 failed { some-- }
                 worker(title = "Increment some") {
                     some++
@@ -89,7 +89,7 @@ class LoopCorBaseTest {
             loopUntil {
                 check { some < 10 }
                 except { status = CorStatuses.FAILING }
-                restarts { 0L }
+                maxEx { 0L }
                 worker(title = "Increment some") {
                     some++
                     throw RuntimeException("ex loop")
@@ -101,7 +101,7 @@ class LoopCorBaseTest {
             loopWhile {
                 check { some < 10 }
                 except { status = CorStatuses.FAILING }
-                restarts { 0L }
+                maxEx { 0L }
                 worker(title = "Increment some") {
                     some++
                     throw RuntimeException("ex loop")
@@ -113,7 +113,7 @@ class LoopCorBaseTest {
             loopUntil {
                 check { some < 6 }
                 except { status = CorStatuses.FAILING }
-                restarts { -1L }
+                maxEx { -1L }
                 failed { some++ }
                 worker(title = "Increment some") {
                     some++
@@ -126,7 +126,7 @@ class LoopCorBaseTest {
             loopWhile {
                 check { some < 6 }
                 except { status = CorStatuses.FAILING }
-                restarts { -1L }
+                maxEx { -1L }
                 failed { some++ }
                 worker(title = "Increment some") {
                     some++
