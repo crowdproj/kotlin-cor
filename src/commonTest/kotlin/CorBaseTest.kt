@@ -36,7 +36,6 @@ class CorBaseTest {
                 on {
                     some < 15
                 }
-
                 worker(title = "Increment some") {
                     some++
                 }

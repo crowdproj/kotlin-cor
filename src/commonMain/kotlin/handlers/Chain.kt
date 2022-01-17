@@ -1,10 +1,8 @@
 package com.crowdproj.kotlin.cor.handlers
 
+import com.crowdproj.kotlin.cor.CorDslMarker
 import com.crowdproj.kotlin.cor.ICorChainDsl
 import com.crowdproj.kotlin.cor.ICorExec
-import com.crowdproj.kotlin.cor.ICorExecDsl
-import com.crowdproj.kotlin.cor.ICorWorker
-import com.crowdproj.kotlin.cor.CorDslMarker
 import com.crowdproj.kotlin.cor.base.BaseCorChain
 import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
 
