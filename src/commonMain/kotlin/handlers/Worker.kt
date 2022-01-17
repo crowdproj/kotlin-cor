@@ -1,10 +1,9 @@
 package com.crowdproj.kotlin.cor.handlers
 
+import com.crowdproj.kotlin.cor.CorDslMarker
 import com.crowdproj.kotlin.cor.ICorChainDsl
 import com.crowdproj.kotlin.cor.ICorExec
 import com.crowdproj.kotlin.cor.ICorWorker
-import com.crowdproj.kotlin.cor.ICorWorkerDsl
-import com.crowdproj.kotlin.cor.CorDslMarker
 import com.crowdproj.kotlin.cor.base.BaseCorWorkerDsl
 
 @CorDslMarker
@@ -43,6 +42,9 @@ class CorWorker<T>(
     override suspend fun except(context: T, e: Throwable) = blockExcept(context, e)
 }
 
+/**
+ * DLS context of a single execution. Cannot be expanded by other chains.
+ */
 @CorDslMarker
 class CorWorkerDsl<T>() : BaseCorWorkerDsl<T>() {
 

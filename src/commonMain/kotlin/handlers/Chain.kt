@@ -28,6 +28,11 @@ class CorChain<T>(
     }
 }
 
+/**
+ * DLS is the execution context of multiple chains.
+ * It can be expanded by other chains.
+ * The chains are executed sequentially.
+ */
 @CorDslMarker
 class CorChainDsl<T>() : BaseCorChainDsl<T>() {
     override fun build(): ICorExec<T> = CorChain(
