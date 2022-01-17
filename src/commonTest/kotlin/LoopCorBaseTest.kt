@@ -1,6 +1,6 @@
 package com.crowdproj.kotlin.cor
 
-import com.crowdproj.kotlin.cor.handlers.loopDoWhile
+import com.crowdproj.kotlin.cor.handlers.loopUntil
 import com.crowdproj.kotlin.cor.handlers.loopWhile
 import com.crowdproj.kotlin.cor.handlers.worker
 import kotlin.test.Test
@@ -11,21 +11,21 @@ class LoopCorBaseTest {
     }
 
     companion object {
-        val loopDoWhile = rootChain<TestContext> {
-            loopDoWhile {
+        val loopUntil = rootChain<TestContext> {
+            loopUntil {
                 title = "Looping"
                 description = "Repeat the business chain until the condition is met"
 
                 on { true }
-                restarts { 5L }
                 check { some < 5 }
                 except { status = CorStatuses.FAILING }
+                restarts { 5L }
                 worker(title = "Increment some") {
                     some++
                     println("=$some")
                 }
             }
-            loopDoWhile {
+            loopUntil {
                 check { some < 10 }
                 except { status = CorStatuses.FAILING }
                 worker(title = "Increment some") {
@@ -41,9 +41,9 @@ class LoopCorBaseTest {
                 description = "Repeat the business chain until the condition is met"
 
                 on { true }
-                restarts { 5L }
                 check { some < 5 }
                 except { status = CorStatuses.FAILING }
+                restarts { 5L }
                 worker(title = "Increment some") {
                     some++
                     println("=$some")
@@ -61,9 +61,9 @@ class LoopCorBaseTest {
 
         val exceptionLoopWhile = rootChain<TestContext> {
             loopWhile {
-                restarts { 5L } // возможное количество исключений
                 check { some < 10 } // выполняется пока true
                 except { status = CorStatuses.FAILING }
+                restarts { 5L } // возможное количество исключений
                 failed { some-- }
                 worker(title = "Increment some") {
                     some++
@@ -72,11 +72,11 @@ class LoopCorBaseTest {
             }
         }.build()
 
-        val exceptionLoopDoWhile = rootChain<TestContext> {
-            loopDoWhile {
+        val exceptionLoopUntil = rootChain<TestContext> {
+            loopUntil {
+                check { some < 10 }
+                except { status = CorStatuses.FAILING }
                 restarts { 5L }
-                check { some < 10 }
-                except { status = CorStatuses.FAILING }
                 failed { some-- }
                 worker(title = "Increment some") {
                     some++
@@ -85,11 +85,11 @@ class LoopCorBaseTest {
             }
         }.build()
 
-        val zeroExceptionLoopDoWhile = rootChain<TestContext> {
-            loopDoWhile {
-                restarts { 0L }
+        val zeroExceptionLoopUntil = rootChain<TestContext> {
+            loopUntil {
                 check { some < 10 }
                 except { status = CorStatuses.FAILING }
+                restarts { 0L }
                 worker(title = "Increment some") {
                     some++
                     throw RuntimeException("ex loop")
@@ -99,9 +99,9 @@ class LoopCorBaseTest {
 
         val zeroExceptionLoopWhile = rootChain<TestContext> {
             loopWhile {
-                restarts { 0L }
                 check { some < 10 }
                 except { status = CorStatuses.FAILING }
+                restarts { 0L }
                 worker(title = "Increment some") {
                     some++
                     throw RuntimeException("ex loop")
@@ -109,11 +109,11 @@ class LoopCorBaseTest {
             }
         }.build()
 
-        val lessThanZeroExceptionLoopDoWhile = rootChain<TestContext> {
-            loopDoWhile {
-                restarts { -1L }
+        val lessThanZeroExceptionLoopUntil = rootChain<TestContext> {
+            loopUntil {
                 check { some < 6 }
                 except { status = CorStatuses.FAILING }
+                restarts { -1L }
                 failed { some++ }
                 worker(title = "Increment some") {
                     some++
@@ -124,9 +124,9 @@ class LoopCorBaseTest {
 
         val lessThanZeroExceptionLoopWhile = rootChain<TestContext> {
             loopWhile {
-                restarts { -1L }
                 check { some < 6 }
                 except { status = CorStatuses.FAILING }
+                restarts { -1L }
                 failed { some++ }
                 worker(title = "Increment some") {
                     some++

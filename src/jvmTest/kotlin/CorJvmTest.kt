@@ -20,8 +20,8 @@ class CorJvmTest {
     }
 
     @Test
-    fun loopDoWhileCorTest() {
-        val chain = LoopCorBaseTest.loopDoWhile
+    fun loopUntilCorTest() {
+        val chain = LoopCorBaseTest.loopUntil
 
         val ctx = TestContext(some = 1)
 
@@ -56,8 +56,8 @@ class CorJvmTest {
     }
 
     @Test
-    fun exceptionLoopDoWhileCorTest() {
-        val chain = LoopCorBaseTest.exceptionLoopDoWhile
+    fun exceptionLoopUntilCorTest() {
+        val chain = LoopCorBaseTest.exceptionLoopUntil
 
         val ctx = TestContext(some = 0)
 
@@ -68,8 +68,8 @@ class CorJvmTest {
     }
 
     @Test
-    fun zeroExceptionLoopDoWhileCorTest() {
-        val chain = LoopCorBaseTest.zeroExceptionLoopDoWhile
+    fun zeroExceptionLoopUntilCorTest() {
+        val chain = LoopCorBaseTest.zeroExceptionLoopUntil
 
         val ctx = TestContext(some = 0)
 
@@ -92,8 +92,8 @@ class CorJvmTest {
     }
 
     @Test
-    fun lessThanZeroExceptionLoopDoWhileCorTest() {
-        val chain = LoopCorBaseTest.lessThanZeroExceptionLoopDoWhile
+    fun lessThanZeroExceptionLoopUntilCorTest() {
+        val chain = LoopCorBaseTest.lessThanZeroExceptionLoopUntil
 
         val ctx = TestContext(some = 0)
 

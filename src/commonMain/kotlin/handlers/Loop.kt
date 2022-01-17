@@ -17,7 +17,7 @@ fun <T> ICorChainDsl<T>.loopWhile(
 }
 
 @CorDslMarker
-fun <T> ICorChainDsl<T>.loopDoWhile(
+fun <T> ICorChainDsl<T>.loopUntil(
     function: CorLoopDsl<T>.() -> Unit
 ) {
     add(
@@ -51,7 +51,7 @@ class CorLoop<T>(
     override suspend fun handle(context: T) {
         when (checkBefore) {
             true -> loopWhile(context)
-            false -> loopDoWhile(context)
+            false -> loopUntil(context)
         }
     }
 
@@ -69,7 +69,7 @@ class CorLoop<T>(
         }
     }
 
-    private suspend fun loopDoWhile(context: T) {
+    private suspend fun loopUntil(context: T) {
         do {
             try {
                 execs.forEach { it.exec(context) }
@@ -120,6 +120,9 @@ class CorLoopDsl<T>(
         blockCheck = function
     }
 
+    /**
+     * Executed when the allowed number of exceptions is exceeded
+     */
     fun failed(function: suspend T.() -> Unit) {
         blockFailed = function
     }
