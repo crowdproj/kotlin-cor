@@ -34,6 +34,7 @@ class CorLoop<T>(
     blockExcept: suspend T.(Throwable) -> Unit = {},
     val blockRestarts: () -> Long = { 0L },
     var blockCheck: suspend T.() -> Boolean = { true },
+    var blockFailed: suspend T.() -> Unit = {},
 ) : BaseCorChain<T>(
     title = title,
     description = description,
@@ -55,13 +56,16 @@ class CorLoop<T>(
     }
 
     private suspend fun loopWhile(context: T) {
-        while (blockCheck.invoke(context) && numException <= maxException - 1) {
+        while (blockCheck.invoke(context) && (maxException < 0 || numException <= maxException - 1)) {
             try {
                 execs.forEach { it.exec(context) }
             } catch (e: Throwable) {
                 except(context, e)
                 numException++
             }
+        }
+        if (numException >= maxException) {
+            blockFailed.invoke(context)
         }
     }
 
@@ -73,7 +77,10 @@ class CorLoop<T>(
                 except(context, e)
                 numException++
             }
-        } while (blockCheck.invoke(context) && numException <= maxException - 1)
+        } while (blockCheck.invoke(context) && (maxException < 0 || numException <= maxException - 1))
+        if (numException >= maxException) {
+            blockFailed.invoke(context)
+        }
     }
 
 }
@@ -83,6 +90,7 @@ class CorLoopDsl<T>(
     private val checkBefore: Boolean,
     var blockRestarts: () -> Long = { LOOP_MAX_EXCEPTION },
     var blockCheck: suspend T.() -> Boolean = { true },
+    var blockFailed: suspend T.() -> Unit = {},
 ) : BaseCorChainDsl<T>() {
     override fun build(): ICorExec<T> = CorLoop(
         checkBefore,
@@ -93,11 +101,12 @@ class CorLoopDsl<T>(
         blockExcept = blockExcept,
         blockRestarts = blockRestarts,
         blockCheck = blockCheck,
+        blockFailed = blockFailed,
     )
 
     /**
-     * Maximum allowed number of exceptions
-     * If the value is less than or equal to zero, the number of exceptions is unlimited
+     * Maximum allowed number of exceptions/restarts
+     * If the value is less than zero, then the number of exceptions is unlimited
      */
     fun restarts(function: () -> Long) {
         blockRestarts = function
@@ -109,6 +118,10 @@ class CorLoopDsl<T>(
      */
     fun check(function: suspend T.() -> Boolean) {
         blockCheck = function
+    }
+
+    fun failed(function: suspend T.() -> Unit) {
+        blockFailed = function
     }
 
 }

@@ -52,11 +52,11 @@ class CorJvmTest {
         runBlocking { chain.exec(ctx) }
 
         assertEquals(CorStatuses.FAILING, ctx.status)
-        assertEquals(5, ctx.some)
+        assertEquals(4, ctx.some)
     }
 
     @Test
-    fun exceptionLoopDoWhile() {
+    fun exceptionLoopDoWhileCorTest() {
         val chain = LoopCorBaseTest.exceptionLoopDoWhile
 
         val ctx = TestContext(some = 0)
@@ -64,7 +64,55 @@ class CorJvmTest {
         runBlocking { chain.exec(ctx) }
 
         assertEquals(CorStatuses.FAILING, ctx.status)
-        assertEquals(5, ctx.some)
+        assertEquals(4, ctx.some)
+    }
+
+    @Test
+    fun zeroExceptionLoopDoWhileCorTest() {
+        val chain = LoopCorBaseTest.zeroExceptionLoopDoWhile
+
+        val ctx = TestContext(some = 0)
+
+        runBlocking { chain.exec(ctx) }
+
+        assertEquals(CorStatuses.FAILING, ctx.status)
+        assertEquals(1, ctx.some)
+    }
+
+    @Test
+    fun zeroExceptionLoopWhileCorTest() {
+        val chain = LoopCorBaseTest.zeroExceptionLoopWhile
+
+        val ctx = TestContext(some = 0)
+
+        runBlocking { chain.exec(ctx) }
+
+        assertNotEquals(CorStatuses.FAILING, ctx.status)
+        assertEquals(0, ctx.some)
+    }
+
+    @Test
+    fun lessThanZeroExceptionLoopDoWhileCorTest() {
+        val chain = LoopCorBaseTest.lessThanZeroExceptionLoopDoWhile
+
+        val ctx = TestContext(some = 0)
+
+        runBlocking { chain.exec(ctx) }
+
+        assertEquals(CorStatuses.FAILING, ctx.status)
+        assertEquals(7, ctx.some)
+    }
+
+    @Test
+    fun lessThanZeroExceptionLoopWhileCorTest() {
+        val chain = LoopCorBaseTest.lessThanZeroExceptionLoopWhile
+
+        val ctx = TestContext(some = 0)
+
+        runBlocking { chain.exec(ctx) }
+
+        assertEquals(CorStatuses.FAILING, ctx.status)
+        assertEquals(7, ctx.some)
     }
 
 }
