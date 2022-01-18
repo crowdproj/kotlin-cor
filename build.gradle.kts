@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.crowdproj.kotlin.cor"
-version = "0.2.4"
+version = "0.2.5"
 
 repositories {
     mavenCentral()
@@ -71,10 +71,10 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/crowdproj/kotlin-cor")
+            url = uri(System.getenv("NEXUS_HOST") ?: "https://maven.pkg.github.com/crowdproj/kotlin-cor")
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv("NEXUS_USER") ?: System.getenv("GITHUB_ACTOR")
+                password = System.getenv("NEXUS_PASS") ?: System.getenv("GITHUB_TOKEN")
             }
         }
     }

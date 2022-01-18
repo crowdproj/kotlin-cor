@@ -1,11 +1,12 @@
 package com.crowdproj.kotlin.cor.handlers
 
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import com.crowdproj.kotlin.cor.*
 import com.crowdproj.kotlin.cor.CorDslMarker
+import com.crowdproj.kotlin.cor.ICorChainDsl
+import com.crowdproj.kotlin.cor.ICorExec
 import com.crowdproj.kotlin.cor.base.BaseCorChain
 import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @CorDslMarker
 fun <T> ICorChainDsl<T>.parallel(function: CorParallelDsl<T>.() -> Unit) {
@@ -33,6 +34,11 @@ class CorParallel<T>(
     }
 }
 
+/**
+ * DLS is the execution context of multiple chains.
+ * It can be expanded by other chains.
+ * Chains are started simultaneously and executed in parallel.
+ */
 @CorDslMarker
 class CorParallelDsl<T>(): BaseCorChainDsl<T>() {
     override fun build(): ICorExec<T> = CorParallel(
