@@ -1,4 +1,4 @@
-image: registry.datana.ru/alpine-java-docker
+image: $JAVA_ALPINE_IMAGE
 
 services:
     - docker:dind
@@ -7,7 +7,7 @@ variables:
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
-    JAVA_IMAGE: registry.datana.ru/alpine-java-docker
+    JAVA_IMAGE: $JAVA_ALPINE_IMAGE
 
 stages:
     - test
