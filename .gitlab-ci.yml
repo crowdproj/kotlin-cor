@@ -1,0 +1,44 @@
+image: registry.datana.ru/alpine-java-docker
+
+services:
+    - docker:dind
+
+variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    JAVA_IMAGE: registry.datana.ru/alpine-java-docker
+
+stages:
+    - test
+    - deploy
+
+before_script:
+    - echo `pwd` # debug
+    # - docker info
+    - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
+    - export GRADLE_USER_HOME=`pwd`/.gradle
+
+cache:
+    paths:
+        - .gradle
+
+test:
+    image: adoptopenjdk/openjdk11:alpine-slim
+    stage: test
+    script:
+        - ./gradlew check
+    only:
+        - /^feature\/.*$/
+
+deploy:
+    stage: deploy
+    script:
+        - ./gradlew deploy
+    only:
+        - dev
+        - master
+        - /^ver-.*$/
+
+after_script:
+    - echo "End CI"
