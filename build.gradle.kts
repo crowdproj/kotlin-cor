@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.crowdproj.kotlin.cor"
-version = "0.2.5"
+version = "0.2.6"
 
 repositories {
     mavenCentral()
@@ -69,16 +69,30 @@ val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
 
 publishing {
     repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri(System.getenv("NEXUS_HOST") ?: "https://maven.pkg.github.com/crowdproj/kotlin-cor")
-            credentials {
-                username = System.getenv("NEXUS_USER") ?: System.getenv("GITHUB_ACTOR")
-                password = System.getenv("NEXUS_PASS") ?: System.getenv("GITHUB_TOKEN")
+        val repoHost: String = System.getenv("NEXUS_HOST") ?: "https://maven.pkg.github.com/crowdproj/kotlin-cor"
+        val repoUser: String? = System.getenv("NEXUS_USER") ?: System.getenv("GITHUB_ACTOR")
+        val repoPass: String? = System.getenv("NEXUS_PASS") ?: System.getenv("GITHUB_TOKEN")
+        if (repoUser != null && repoPass != null) {
+            maven {
+                name = "GitHubPackages"
+                url = uri(repoHost)
+                credentials {
+                    username = repoUser
+                    password = repoPass
+                }
             }
         }
     }
     publications.withType<MavenPublication> {
         artifact(javadocJar)
     }
+}
+
+tasks {
+    create("deploy") {
+        group = "build"
+        dependsOn(build)
+        dependsOn(publish)
+    }
+
 }
