@@ -33,7 +33,7 @@ class CorLoop<T>(
     description: String = "",
     blockOn: suspend T.() -> Boolean = { true },
     blockExcept: suspend T.(Throwable) -> Unit = {},
-    val blockMaxEx: () -> Long = { LOOP_MAX_EXCEPTION },
+    val blockMaxEx: suspend T.() -> Long = { LOOP_MAX_EXCEPTION },
     var blockCheck: suspend T.() -> Boolean = { true },
     var blockFailed: suspend T.() -> Unit = {},
 ) : BaseCorChain<T>(
@@ -42,12 +42,6 @@ class CorLoop<T>(
     blockOn = blockOn,
     blockExcept = blockExcept
 ) {
-    private var numException = 0L
-    private var maxException = LOOP_MAX_EXCEPTION
-
-    init {
-        maxException = blockMaxEx.invoke().takeIf { it >= 0 } ?: blockMaxEx.invoke().absoluteValue
-    }
 
     override suspend fun handle(context: T) {
         when (checkBefore) {
@@ -57,6 +51,8 @@ class CorLoop<T>(
     }
 
     private suspend fun loopWhile(context: T) {
+        var numException = 0L
+        val maxException = blockMaxEx.invoke(context).takeIf { it >= 0 } ?: blockMaxEx.invoke(context).absoluteValue
         while (blockCheck.invoke(context)
             && (numException < maxException
                     || (numException == 0L && maxException == 0L))
@@ -74,6 +70,8 @@ class CorLoop<T>(
     }
 
     private suspend fun loopUntil(context: T) {
+        var numException = 0L
+        val maxException = blockMaxEx.invoke(context).takeIf { it >= 0 } ?: blockMaxEx.invoke(context).absoluteValue
         do {
             try {
                 execs.forEach { it.exec(context) }
@@ -95,7 +93,7 @@ class CorLoop<T>(
 @CorDslMarker
 class CorLoopDsl<T>(
     private val checkBefore: Boolean,
-    var blockMaxEx: () -> Long = { LOOP_MAX_EXCEPTION },
+    var blockMaxEx: suspend T.() -> Long = { LOOP_MAX_EXCEPTION },
     var blockCheck: suspend T.() -> Boolean = { true },
     var blockFailed: suspend T.() -> Unit = {},
 ) : BaseCorChainDsl<T>() {
@@ -115,7 +113,7 @@ class CorLoopDsl<T>(
      * Maximum allowed number of exceptions
      * If the value is less than zero, then the number of exceptions is unlimited
      */
-    fun maxEx(function: () -> Long) {
+    fun maxEx(function: suspend T.() -> Long) {
         blockMaxEx = function
     }
 
