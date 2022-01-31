@@ -1,12 +1,10 @@
 package com.crowdproj.kotlin.cor.handlers
 
-import com.crowdproj.kotlin.cor.Const.LOOP_MAX_EXCEPTION
 import com.crowdproj.kotlin.cor.CorDslMarker
 import com.crowdproj.kotlin.cor.ICorChainDsl
 import com.crowdproj.kotlin.cor.ICorExec
 import com.crowdproj.kotlin.cor.base.BaseCorChain
 import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
-import kotlin.math.absoluteValue
 
 @CorDslMarker
 fun <T> ICorChainDsl<T>.loopWhile(
@@ -33,9 +31,7 @@ class CorLoop<T>(
     description: String = "",
     blockOn: suspend T.() -> Boolean = { true },
     blockExcept: suspend T.(Throwable) -> Unit = {},
-    val blockMaxEx: suspend T.() -> Long = { LOOP_MAX_EXCEPTION },
     var blockCheck: suspend T.() -> Boolean = { true },
-    var blockFailed: suspend T.() -> Unit = {},
 ) : BaseCorChain<T>(
     title = title,
     description = description,
@@ -51,41 +47,23 @@ class CorLoop<T>(
     }
 
     private suspend fun loopWhile(context: T) {
-        var numException = 0L
-        val maxException = blockMaxEx.invoke(context).takeIf { it >= 0 } ?: blockMaxEx.invoke(context).absoluteValue
-        while (blockCheck.invoke(context)
-            && (numException < maxException
-                    || (numException == 0L && maxException == 0L))
-        ) {
+        while (blockCheck.invoke(context)) {
             try {
                 execs.forEach { it.exec(context) }
             } catch (e: Throwable) {
                 except(context, e)
-                numException++
             }
-        }
-        if (numException >= maxException) {
-            blockFailed.invoke(context)
         }
     }
 
     private suspend fun loopUntil(context: T) {
-        var numException = 0L
-        val maxException = blockMaxEx.invoke(context).takeIf { it >= 0 } ?: blockMaxEx.invoke(context).absoluteValue
         do {
             try {
                 execs.forEach { it.exec(context) }
             } catch (e: Throwable) {
                 except(context, e)
-                numException++
             }
-        } while (blockCheck.invoke(context)
-            && (numException < maxException
-                    || (numException == 0L && maxException == 0L))
-        )
-        if (numException >= maxException) {
-            blockFailed.invoke(context)
-        }
+        } while (blockCheck.invoke(context))
     }
 
 }
@@ -93,9 +71,7 @@ class CorLoop<T>(
 @CorDslMarker
 class CorLoopDsl<T>(
     private val checkBefore: Boolean,
-    var blockMaxEx: suspend T.() -> Long = { LOOP_MAX_EXCEPTION },
     var blockCheck: suspend T.() -> Boolean = { true },
-    var blockFailed: suspend T.() -> Unit = {},
 ) : BaseCorChainDsl<T>() {
     override fun build(): ICorExec<T> = CorLoop(
         checkBefore,
@@ -104,18 +80,8 @@ class CorLoopDsl<T>(
         execs = workers.map { it.build() }.toList(),
         blockOn = blockOn,
         blockExcept = blockExcept,
-        blockMaxEx = blockMaxEx,
         blockCheck = blockCheck,
-        blockFailed = blockFailed,
     )
-
-    /**
-     * Maximum allowed number of exceptions
-     * If the value is less than zero, then the number of exceptions is unlimited
-     */
-    fun maxEx(function: suspend T.() -> Long) {
-        blockMaxEx = function
-    }
 
     /**
      * Cycle repetition condition
@@ -123,13 +89,6 @@ class CorLoopDsl<T>(
      */
     fun check(function: suspend T.() -> Boolean) {
         blockCheck = function
-    }
-
-    /**
-     * Executed when the allowed number of exceptions is exceeded
-     */
-    fun failed(function: suspend T.() -> Unit) {
-        blockFailed = function
     }
 
 }
