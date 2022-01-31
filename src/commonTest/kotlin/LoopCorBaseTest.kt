@@ -19,7 +19,6 @@ class LoopCorBaseTest {
                 on { true }
                 check { some < 5 }
                 except { status = CorStatuses.FAILING }
-                maxEx { 5L }
                 worker(title = "Increment some") {
                     some++
                     println("=$some")
@@ -43,7 +42,6 @@ class LoopCorBaseTest {
                 on { true }
                 check { some < 5 }
                 except { status = CorStatuses.FAILING }
-                maxEx { 5L }
                 worker(title = "Increment some") {
                     some++
                     println("=$some")
@@ -55,82 +53,6 @@ class LoopCorBaseTest {
                 worker(title = "Increment some") {
                     some++
                     println("=$some")
-                }
-            }
-        }.build()
-
-        val exceptionLoopWhile = rootChain<TestContext> {
-            loopWhile {
-                check { some < 10 } // выполняется пока true
-                except { status = CorStatuses.FAILING }
-                maxEx { 5L } // возможное количество исключений
-                failed { some-- }
-                worker(title = "Increment some") {
-                    some++
-                    throw RuntimeException("ex loop")
-                }
-            }
-        }.build()
-
-        val exceptionLoopUntil = rootChain<TestContext> {
-            loopUntil {
-                check { some < 10 }
-                except { status = CorStatuses.FAILING }
-                maxEx { 5L }
-                failed { some-- }
-                worker(title = "Increment some") {
-                    some++
-                    throw RuntimeException("ex loop")
-                }
-            }
-        }.build()
-
-        val zeroExceptionLoopUntil = rootChain<TestContext> {
-            loopUntil {
-                check { some < 10 }
-                except { status = CorStatuses.FAILING }
-                maxEx { 0L }
-                worker(title = "Increment some") {
-                    some++
-                    throw RuntimeException("ex loop")
-                }
-            }
-        }.build()
-
-        val zeroExceptionLoopWhile = rootChain<TestContext> {
-            loopWhile {
-                check { some < 10 }
-                except { status = CorStatuses.FAILING }
-                maxEx { 0L }
-                worker(title = "Increment some") {
-                    some++
-                    throw RuntimeException("ex loop")
-                }
-            }
-        }.build()
-
-        val lessThanZeroExceptionLoopUntil = rootChain<TestContext> {
-            loopUntil {
-                check { some < 6 }
-                except { status = CorStatuses.FAILING }
-                maxEx { -1L }
-                failed { some++ }
-                worker(title = "Increment some") {
-                    some++
-                    throw RuntimeException("ex loop")
-                }
-            }
-        }.build()
-
-        val lessThanZeroExceptionLoopWhile = rootChain<TestContext> {
-            loopWhile {
-                check { some < 6 }
-                except { status = CorStatuses.FAILING }
-                maxEx { -1L }
-                failed { some++ }
-                worker(title = "Increment some") {
-                    some++
-                    throw RuntimeException("ex loop")
                 }
             }
         }.build()
