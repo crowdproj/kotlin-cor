@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.crowdproj.kotlin.cor"
-version = "0.2.7"
+version = "0.2.8"
 
 repositories {
     mavenCentral()
@@ -16,9 +16,8 @@ kotlin {
 //        browser {}
         nodejs()
     }
-    jvm {
-
-    }
+    jvm()
+    linuxX64()
 
     sourceSets {
         val coroutinesVersion: String by project
@@ -33,6 +32,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
             }
         }
         val jsMain by getting {
@@ -53,6 +53,16 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
+            }
+        }
+        val linuxX64Main by getting {
+            dependencies {
+                implementation(kotlin("stdlib"))
+            }
+        }
+        val linuxX64Test by getting {
+            dependencies {
+                implementation(kotlin("test"))
             }
         }
     }
