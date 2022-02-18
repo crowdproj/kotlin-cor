@@ -5,15 +5,15 @@ plugins {
 }
 
 group = "com.crowdproj.kotlin.cor"
-version = "0.2.8"
+version = "0.2.9"
 
 repositories {
     mavenCentral()
 }
 
 kotlin {
-    js {
-//        browser {}
+    js(BOTH) {
+        browser()
         nodejs()
     }
     jvm()
