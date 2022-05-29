@@ -4,13 +4,12 @@ import com.crowdproj.kotlin.cor.handlers.chain
 import com.crowdproj.kotlin.cor.handlers.parallel
 import com.crowdproj.kotlin.cor.handlers.worker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class CorBaseTest {
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun createCor() = runTest {
         val ctx = TestContext(some = 0)

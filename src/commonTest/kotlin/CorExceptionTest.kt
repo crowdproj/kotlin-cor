@@ -2,12 +2,14 @@ package com.crowdproj.kotlin.cor
 
 import com.crowdproj.kotlin.cor.handlers.chain
 import com.crowdproj.kotlin.cor.handlers.worker
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.js.JsName
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class CorExceptionTest {
 
     @Test
@@ -63,7 +65,7 @@ class CorExceptionTest {
                         throw e
                     }
                 }
-                except { e -> text = "${e.message}$testText2" ?: "" }
+                except { e -> text = "${e.message}$testText2" }
             }
         }.build()
 

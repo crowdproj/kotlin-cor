@@ -3,10 +3,12 @@ package com.crowdproj.kotlin.cor
 import com.crowdproj.kotlin.cor.handlers.loopUntil
 import com.crowdproj.kotlin.cor.handlers.loopWhile
 import com.crowdproj.kotlin.cor.handlers.worker
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LoopCorBaseTest {
     @Test
     fun loopUntil() = runTest {

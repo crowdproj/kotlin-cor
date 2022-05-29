@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.crowdproj.kotlin.cor"
-version = "0.3.0"
+version = "0.3.1"
 
 repositories {
     mavenCentral()
@@ -23,6 +23,8 @@ kotlin {
 
     sourceSets {
         val coroutinesVersion: String by project
+
+        all { languageSettings.optIn("kotlin.RequiresOptIn") }
 
         @Suppress("UNUSED_VARIABLE")
         val commonMain by getting {
