@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.crowdproj.kotlin.cor"
-version = "0.3.1"
+version = "0.4.0"
 
 repositories {
     mavenCentral()
@@ -18,7 +18,29 @@ kotlin {
     }
     jvm()
     linuxX64()
+    linuxArm64()
+    linuxArm32Hfp()
+    linuxMips32()
+    linuxMipsel32()
+    ios()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
     macosX64()
+    macosArm64()
+    tvos()
+    tvosArm64()
+    tvosSimulatorArm64()
+    tvosX64()
+    watchos()
+    watchosArm32()
+    watchosSimulatorArm64()
+    watchosArm64()
+    watchosX86()
+    watchosX64()
+    wasm()
+    wasm32()
+    mingwX86()
     mingwX64()
 
     sourceSets {

@@ -16,7 +16,7 @@ dependencies {
 ```
 #### **`gradle.properties`**
 ```properties
-kotlinCorVersion=0.3.1+
+kotlinCorVersion=0.4.0+
 ```
 
 ## Usage
