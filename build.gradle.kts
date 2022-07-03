@@ -18,10 +18,10 @@ kotlin {
     }
     jvm()
     linuxX64()
-    linuxArm64()
-    linuxArm32Hfp()
-    linuxMips32()
-    linuxMipsel32()
+//    linuxArm64()
+//    linuxArm32Hfp()
+//    linuxMips32()
+//    linuxMipsel32()
     ios()
     iosX64()
     iosArm64()
@@ -38,9 +38,9 @@ kotlin {
     watchosArm64()
     watchosX86()
     watchosX64()
-    wasm()
-    wasm32()
-    mingwX86()
+//    wasm()
+//    wasm32()
+//    mingwX86()
     mingwX64()
 
     sourceSets {
