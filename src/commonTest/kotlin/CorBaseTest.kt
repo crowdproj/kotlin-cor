@@ -3,6 +3,8 @@ package com.crowdproj.kotlin.cor
 import com.crowdproj.kotlin.cor.handlers.chain
 import com.crowdproj.kotlin.cor.handlers.parallel
 import com.crowdproj.kotlin.cor.handlers.worker
+import com.crowdproj.kotlin.cor.helper.CorStatuses
+import com.crowdproj.kotlin.cor.helper.TestContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -56,20 +58,7 @@ class CorBaseTest {
     }
 }
 
-private fun ICorChainDsl<TestContext>.printResult() = worker(title = "Print example") {
+private fun ICorAddExecDsl<TestContext>.printResult() = worker(title = "Print example") {
     println("some = $some")
 }
 
-data class TestContext(
-    var status: CorStatuses = CorStatuses.NONE,
-    var some: Int = Int.MIN_VALUE,
-    var text: String = "",
-) {
-
-}
-
-enum class CorStatuses {
-    NONE,
-    RUNNING,
-    FAILING,
-}

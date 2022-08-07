@@ -8,7 +8,7 @@ abstract class BaseCorWorkerDsl<T>(
     protected var blockOn: suspend T.() -> Boolean = { true },
     protected var blockHandle: suspend T.() -> Unit = {},
     protected var blockExcept: suspend T.(e: Throwable) -> Unit = { e: Throwable -> throw e },
-) : ICorWorkerDsl<T> {
+) : ICorExecDsl<T>, ICorOnDsl<T>, ICorExceptDsl<T>, ICorHandleDsl<T> {
 
     abstract override fun build(): ICorExec<T>
 

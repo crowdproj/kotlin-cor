@@ -1,13 +1,10 @@
 package com.crowdproj.kotlin.cor.handlers
 
-import com.crowdproj.kotlin.cor.CorDslMarker
-import com.crowdproj.kotlin.cor.ICorChainDsl
-import com.crowdproj.kotlin.cor.ICorExec
-import com.crowdproj.kotlin.cor.ICorWorker
+import com.crowdproj.kotlin.cor.*
 import com.crowdproj.kotlin.cor.base.BaseCorWorkerDsl
 
 @CorDslMarker
-fun <T> ICorChainDsl<T>.worker(
+fun <T> ICorAddExecDsl<T>.worker(
     function: CorWorkerDsl<T>.() -> Unit
 ) {
     add(
@@ -16,7 +13,7 @@ fun <T> ICorChainDsl<T>.worker(
 }
 
 @CorDslMarker
-fun <T> ICorChainDsl<T>.worker(
+fun <T> ICorAddExecDsl<T>.worker(
     title: String,
     description: String = "",
     function: suspend T.() -> Unit

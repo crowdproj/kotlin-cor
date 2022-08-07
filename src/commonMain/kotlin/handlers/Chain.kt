@@ -1,13 +1,13 @@
 package com.crowdproj.kotlin.cor.handlers
 
 import com.crowdproj.kotlin.cor.CorDslMarker
-import com.crowdproj.kotlin.cor.ICorChainDsl
+import com.crowdproj.kotlin.cor.ICorAddExecDsl
 import com.crowdproj.kotlin.cor.ICorExec
 import com.crowdproj.kotlin.cor.base.BaseCorChain
 import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
 
 @CorDslMarker
-fun <T> ICorChainDsl<T>.chain(function: CorChainDsl<T>.() -> Unit) {
+fun <T> ICorAddExecDsl<T>.chain(function: CorChainDsl<T>.() -> Unit) {
     add(CorChainDsl<T>().apply(function))
 }
 
@@ -34,7 +34,7 @@ class CorChain<T>(
  * The chains are executed sequentially.
  */
 @CorDslMarker
-class CorChainDsl<T>() : BaseCorChainDsl<T>() {
+class CorChainDsl<T>() : BaseCorChainDsl<T,T>() {
     override fun build(): ICorExec<T> = CorChain(
         title = title,
         description = description,

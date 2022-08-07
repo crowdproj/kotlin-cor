@@ -9,16 +9,19 @@ interface ICorExecDsl<T> {
     fun build(): ICorExec<T>
 }
 
-interface ICorHandlerDsl<T> {
+interface ICorOnDsl<T> {
     fun on(function: suspend T.() -> Boolean)
+}
+
+interface ICorExceptDsl<T> {
     fun except(function: suspend T.(e: Throwable) -> Unit)
 }
 
-interface ICorChainDsl<T> : ICorExecDsl<T>, ICorHandlerDsl<T> {
+interface ICorAddExecDsl<T> {
     fun add(worker: ICorExecDsl<T>)
 }
 
-interface ICorWorkerDsl<T> : ICorExecDsl<T>, ICorHandlerDsl<T> {
+interface ICorHandleDsl<T> {
     fun handle(function: suspend T.() -> Unit)
 }
 

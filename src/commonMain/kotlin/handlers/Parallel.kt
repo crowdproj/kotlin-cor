@@ -1,7 +1,7 @@
 package com.crowdproj.kotlin.cor.handlers
 
 import com.crowdproj.kotlin.cor.CorDslMarker
-import com.crowdproj.kotlin.cor.ICorChainDsl
+import com.crowdproj.kotlin.cor.ICorAddExecDsl
 import com.crowdproj.kotlin.cor.ICorExec
 import com.crowdproj.kotlin.cor.base.BaseCorChain
 import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
@@ -9,7 +9,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @CorDslMarker
-fun <T> ICorChainDsl<T>.parallel(function: CorParallelDsl<T>.() -> Unit) {
+fun <T> ICorAddExecDsl<T>.parallel(function: CorParallelDsl<T>.() -> Unit) {
     add(CorParallelDsl<T>().apply(function))
 }
 
@@ -40,7 +40,7 @@ class CorParallel<T>(
  * Chains are started simultaneously and executed in parallel.
  */
 @CorDslMarker
-class CorParallelDsl<T>(): BaseCorChainDsl<T>() {
+class CorParallelDsl<T>(): BaseCorChainDsl<T,T>() {
     override fun build(): ICorExec<T> = CorParallel(
         title = title,
         description = description,
