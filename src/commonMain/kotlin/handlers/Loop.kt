@@ -1,13 +1,13 @@
 package com.crowdproj.kotlin.cor.handlers
 
 import com.crowdproj.kotlin.cor.CorDslMarker
-import com.crowdproj.kotlin.cor.ICorChainDsl
+import com.crowdproj.kotlin.cor.ICorAddExecDsl
 import com.crowdproj.kotlin.cor.ICorExec
 import com.crowdproj.kotlin.cor.base.BaseCorChain
 import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
 
 @CorDslMarker
-fun <T> ICorChainDsl<T>.loopWhile(
+fun <T> ICorAddExecDsl<T>.loopWhile(
     function: CorLoopDsl<T>.() -> Unit
 ) {
     add(
@@ -16,7 +16,7 @@ fun <T> ICorChainDsl<T>.loopWhile(
 }
 
 @CorDslMarker
-fun <T> ICorChainDsl<T>.loopUntil(
+fun <T> ICorAddExecDsl<T>.loopUntil(
     function: CorLoopDsl<T>.() -> Unit
 ) {
     add(
@@ -72,7 +72,7 @@ class CorLoop<T>(
 class CorLoopDsl<T>(
     private val checkBefore: Boolean,
     var blockCheck: suspend T.() -> Boolean = { true },
-) : BaseCorChainDsl<T>() {
+) : BaseCorChainDsl<T,T>() {
     override fun build(): ICorExec<T> = CorLoop(
         checkBefore,
         title = title,
