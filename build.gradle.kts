@@ -1,14 +1,19 @@
 plugins {
     kotlin("multiplatform")
     `maven-publish`
+    id("signing")
     id("org.jetbrains.dokka")
 }
 
-group = "com.crowdproj.kotlin.cor"
-version = "0.5.0"
+group = "com.crowdproj"
+version = "0.5.3"
 
 repositories {
     mavenCentral()
+}
+
+signing {
+    sign(publishing.publications)
 }
 
 kotlin {
@@ -126,9 +131,31 @@ publishing {
                 }
             }
         }
+
     }
-    publications.withType<MavenPublication> {
-        artifact(javadocJar)
+    publications {
+        create<MavenPublication>("maven") {
+            artifactId = project.name
+            groupId = rootProject.group.toString()
+            version = rootProject.version.toString()
+            artifact(javadocJar)
+            pom {
+                name.set("Kotlin CoR")
+                description.set("Chain of Responsibility Design Template Library for human readable business logic")
+                url.set("https://github.com/crowdproj/kotlin-cor")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/crowdproj/kotlin-cor.git")
+                    developerConnection.set("scm:git:ssh://github.com/crowdproj/kotlin-cor.git")
+                    url.set("https://github.com/crowdproj/kotlin-cor")
+                }
+            }
+        }
     }
 }
 

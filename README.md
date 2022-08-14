@@ -6,12 +6,13 @@
 ```kotlin
 repositories {
     mavenCentral()
-    maven { url = uri("https://jitpack.io") }
+//    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
     val kotlinCorVersion: String by project
-    implementation("com.github.crowdproj.kotlin-cor:kotlin-cor:$kotlinCorVersion")
+//    implementation("com.github.crowdproj.kotlin-cor:kotlin-cor:$kotlinCorVersion")
+    implementation("com.crowdproj.kotlin.cor:kotlin-cor:$kotlinCorVersion")
 }
 ```
 #### **`gradle.properties`**
