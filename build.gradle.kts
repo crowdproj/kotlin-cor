@@ -184,7 +184,7 @@ tasks {
     create("deploy") {
         group = "build"
         dependsOn(publish)
-        dependsOn(closeAndReleaseRepository)
+//        dependsOn(closeAndReleaseRepository)
     }
 
 }
