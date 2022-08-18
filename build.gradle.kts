@@ -18,6 +18,7 @@ signing {
 }
 
 nexusStaging {
+    serverUrl = "https://s01.oss.sonatype.org/service/local/"
     packageGroup = "com.crowdproj" //optional if packageGroup == project.getGroup()
 //    stagingProfileId = "yourStagingProfileId" //when not defined will be got from server using "packageGroup"
 }
