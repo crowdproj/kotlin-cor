@@ -173,9 +173,16 @@ publishing {
 }
 
 tasks {
+    closeAndReleaseRepository {
+        dependsOn(publish)
+    }
+
+    publish {
+        dependsOn(build)
+    }
+
     create("deploy") {
         group = "build"
-        dependsOn(build)
         dependsOn(publish)
         dependsOn(closeAndReleaseRepository)
     }
