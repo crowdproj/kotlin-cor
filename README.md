@@ -1,3 +1,5 @@
+[![Download](https://img.shields.io/maven-central/v/com.crowdproj/kotlin-cor)](https://search.maven.org/artifact/com.crowdproj/kotlin-cor)
+
 # Kotlin Chain of Responsibility Template Library
 
 ## Installation
