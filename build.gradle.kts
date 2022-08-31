@@ -1,14 +1,26 @@
 plugins {
     kotlin("multiplatform")
     `maven-publish`
+    id("signing")
     id("org.jetbrains.dokka")
+    id("io.codearte.nexus-staging")
 }
 
-group = "com.crowdproj.kotlin.cor"
-version = "0.5.0"
+group = "com.crowdproj"
+version = "0.5.4"
 
 repositories {
     mavenCentral()
+}
+
+signing {
+    sign(publishing.publications)
+}
+
+nexusStaging {
+    serverUrl = "https://s01.oss.sonatype.org/service/local/"
+    packageGroup = "com.crowdproj" //optional if packageGroup == project.getGroup()
+//    stagingProfileId = "yourStagingProfileId" //when not defined will be got from server using "packageGroup"
 }
 
 kotlin {
@@ -126,17 +138,54 @@ publishing {
                 }
             }
         }
+
     }
-    publications.withType<MavenPublication> {
-        artifact(javadocJar)
+    publications {
+        withType(MavenPublication::class).configureEach {
+            artifact(javadocJar)
+            pom {
+                name.set("Kotlin CoR")
+                description.set("Chain of Responsibility Design Template Library for human readable business logic: $name platform")
+                url.set("https://github.com/crowdproj/kotlin-cor")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        name.set("Sergey Okatov")
+                        email.set("sokatov@gmail.com")
+                        id.set("svok")
+                        organization.set("CrowdProj")
+                        organizationUrl.set("https://crowdproj.com")
+                        timezone.set("GMT+5")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/crowdproj/kotlin-cor.git")
+                    developerConnection.set("scm:git:ssh://github.com/crowdproj/kotlin-cor.git")
+                    url.set("https://github.com/crowdproj/kotlin-cor")
+                }
+            }
+        }
     }
 }
 
 tasks {
+    closeAndReleaseRepository {
+        dependsOn(publish)
+    }
+
+    publish {
+        dependsOn(build)
+    }
+
     create("deploy") {
         group = "build"
-        dependsOn(build)
         dependsOn(publish)
+//        dependsOn(closeAndReleaseRepository)
     }
 
 }
