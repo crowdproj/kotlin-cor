@@ -5,16 +5,19 @@ import com.crowdproj.kotlin.cor.ICorAddExecDsl
 import com.crowdproj.kotlin.cor.ICorExec
 import com.crowdproj.kotlin.cor.base.BaseCorChain
 import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
 
 @CorDslMarker
-fun <T, K> ICorAddExecDsl<T>.subChain(function: CorSubChainDsl<T,K>.() -> Unit) {
-    add(CorSubChainDsl<T,K>().apply(function))
+fun <T, K> ICorAddExecDsl<T>.subChain(function: CorSubChainDsl<T, K>.() -> Unit) {
+    add(CorSubChainDsl<T, K>().apply(function))
 }
 
-class CorSubChain<T,K>(
+class CorSubChain<T, K>(
     private val execs: List<ICorExec<K>>,
     title: String,
     description: String = "",
@@ -33,9 +36,9 @@ class CorSubChain<T,K>(
     override suspend fun handle(context: T): Unit = coroutineScope {
         context
             .blockSplit()
-            .onEach { subCtx -> execs.map{ launch { it.exec(subCtx) } }.forEach { it.join() } }
-            .buffer(buffer)
-            .collect { context.blockJoin(it) }
+            .map { subCtx -> async { execs.forEach { it.exec(subCtx) }; subCtx } }
+            .run { if (buffer > 0) buffer(buffer) else this }
+            .collect { context.blockJoin(it.await()) }
     }
 }
 
@@ -44,13 +47,16 @@ class CorSubChain<T,K>(
  * It can be expanded by other chains.
  */
 @CorDslMarker
-class CorSubChainDsl<T,K>(
-): BaseCorChainDsl<T,K>() {
+class CorSubChainDsl<T, K>(
+) : BaseCorChainDsl<T, K>() {
     private var blockSplit: suspend T.() -> Flow<K> = { emptyFlow() }
     private var blockJoin: suspend T.(K) -> Unit = {}
     private var bufferSize: Int = 0
 
     fun buffer(size: Int) {
+        require(size >= 0) {
+            "Buffer must be more or equal than zero. Zero means unbuffered execution"
+        }
         bufferSize = size
     }
 
