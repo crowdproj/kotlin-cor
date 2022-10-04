@@ -38,3 +38,11 @@ jobs:
           NEXUS_USER: ${{ secrets.OSSRH_USER }}
           NEXUS_PASS: ${{ secrets.OSSRH_PASS }}
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Report unit tests
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Gradle Tests
+          path: '**/build/test-results/*/TEST-*.xml'
+          reporter: java-junit
+          fail-on-error: true
