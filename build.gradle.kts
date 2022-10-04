@@ -190,9 +190,9 @@ tasks {
 //    this.forEach {
 //        println("${it.name} ${it::class}")
 //    }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinTest> {
+    withType<Test> {
+        useJUnitPlatform()
         reports {
-            html.required.set(true)
             junitXml.required.set(true)
         }
     }
@@ -207,7 +207,4 @@ tasks {
 //        dependsOn(closeAndReleaseRepository)
     }
 
-    withType<Test>() {
-        useJUnitPlatform()
-    }
 }

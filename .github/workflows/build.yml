@@ -37,15 +37,15 @@ jobs:
 #          distribution: 'adopt'
 
       - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
+        uses: gradle/wrapper-validation-action@v1
 
       - name: Run Tests
-        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: allTests
 
       - name: List Tests
-        run: ls .;ls build/; ls build/test-results/; ls build/test-results/jvmTest/
+        run: ls .;echo "---build";ls build/;echo "---test-results"; ls build/test-results/;echo "---jvmTest"; ls build/test-results/jvmTest/
 
       - name: Test Report
         uses: dorny/test-reporter@v1
