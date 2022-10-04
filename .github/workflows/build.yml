@@ -21,20 +21,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-#      - uses: actions/checkout@v3
-#
-#      - name: Set up JDK 11
-#        uses: actions/setup-java@v3
-#        with:
-#          java-version: '11'
-#          distribution: 'temurin'
-#
-      - uses: actions/checkout@v2
-      - name: Set up Java
-        uses: actions/setup-java@v2
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
         with:
           java-version: '11'
-          distribution: 'adopt'
+          distribution: 'temurin'
+
+#      - uses: actions/checkout@v2
+#      - name: Set up Java
+#        uses: actions/setup-java@v2
+#        with:
+#          java-version: '11'
+#          distribution: 'adopt'
 
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
@@ -43,6 +43,9 @@ jobs:
         uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
         with:
           arguments: allTests
+
+      - name: List Tests
+        run: ls .;ls build; ls build/test-results; ls build/test-results/jvmTest/*.xml
 
       - name: Test Report
         uses: dorny/test-reporter@v1
