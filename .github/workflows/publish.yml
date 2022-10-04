@@ -31,13 +31,23 @@ jobs:
           mkdir -p ~/.gradle
           echo "${{secrets.OSSRH_SIGNING_SECRET_KEY_RING_FILE}}" > ~/.gradle/secring.gpg.b64
           base64 -d ~/.gradle/secring.gpg.b64 > ~/.gradle/secring.gpg
-      - name: Publish package
-        run: ./gradlew --stacktrace deploy -Psigning.keyId=${{secrets.OSSRH_SIGNING_KEY_ID}} -Psigning.password='${{secrets.OSSRH_GPG_SECRET_KEY_PASSWORD}}' -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg)
+
+      - name: Run Tests
+        uses: gradle/gradle-build-action@v2
         env:
           NEXUS_HOST: ${{ secrets.OSSRH_HOST }}
           NEXUS_USER: ${{ secrets.OSSRH_USER }}
           NEXUS_PASS: ${{ secrets.OSSRH_PASS }}
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          arguments: --stacktrace deploy -Psigning.keyId=${{secrets.OSSRH_SIGNING_KEY_ID}} -Psigning.password='${{secrets.OSSRH_GPG_SECRET_KEY_PASSWORD}}' -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg)
+#      - name: Publish package
+#        run: ./gradlew --stacktrace deploy -Psigning.keyId=${{secrets.OSSRH_SIGNING_KEY_ID}} -Psigning.password='${{secrets.OSSRH_GPG_SECRET_KEY_PASSWORD}}' -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg)
+#        env:
+#          NEXUS_HOST: ${{ secrets.OSSRH_HOST }}
+#          NEXUS_USER: ${{ secrets.OSSRH_USER }}
+#          NEXUS_PASS: ${{ secrets.OSSRH_PASS }}
+##          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Report unit tests
         uses: dorny/test-reporter@v1
         if: always()
