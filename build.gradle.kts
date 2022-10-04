@@ -101,7 +101,9 @@ kotlin {
         @Suppress("UNUSED_VARIABLE")
         val jvmTest by getting {
             dependencies {
-                implementation(kotlin("test-junit"))
+                implementation(kotlin("test-junit5"))
+                implementation("io.kotlintest:kotlintest-runner-junit5:3.3.2")
+                runtimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
             }
         }
 
@@ -205,4 +207,7 @@ tasks {
 //        dependsOn(closeAndReleaseRepository)
     }
 
+    withType<Test>() {
+        useJUnitPlatform()
+    }
 }
