@@ -185,9 +185,9 @@ tasks {
         dependsOn(publish)
     }
 
-    this.forEach {
-        println("${it.name} ${it::class}")
-    }
+//    this.forEach {
+//        println("${it.name} ${it::class}")
+//    }
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinTest> {
         reports {
             html.required.set(true)
