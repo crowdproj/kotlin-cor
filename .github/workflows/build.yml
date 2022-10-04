@@ -22,22 +22,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
           java-version: '11'
           distribution: 'temurin'
+
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
-      - name: Build package
-        run: gradle allTests build
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Report unit tests
-        uses: dorny/test-reporter@v1
-        if: always()
+
+      - name: Run Tests
+        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
         with:
-          name: Gradle Tests
-          path: 'build/test-results/jvmTest/TEST-*.xml'
+          arguments: allTests
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Unit Test Results
+          path: build/test-results/**/*.xml
           reporter: java-junit
-          fail-on-error: true
