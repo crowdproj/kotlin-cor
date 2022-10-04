@@ -38,6 +38,6 @@ jobs:
         if: always()
         with:
           name: Gradle Tests
-          path: '**/build/test-results/*/TEST-*.xml'
+          path: '**/build/test-results/**/TEST-*.xml'
           reporter: java-junit
           fail-on-error: true
