@@ -93,7 +93,7 @@ class SubChainSequentialTest {
                     text = ""
                     str.map { TestSubContext(str = it.toString(), parent = this) }.asFlow()
                 }
-                worker("") { val del = 100 - str.toLong() * 10; println("$str $del"); delay(del); str += ";" }
+                worker("") { val del = 1000 - str.toLong() * 100; println("$str $del"); delay(del); str += ";" }
                 worker("") { parent.text += str }
             }
         }.build()
