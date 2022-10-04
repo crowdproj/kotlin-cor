@@ -45,7 +45,7 @@ jobs:
           arguments: allTests
 
       - name: List Tests
-        run: ls .;ls build; ls build/test-results; ls build/test-results/jvmTest/*.xml
+        run: ls .;ls build/; ls build/test-results/; ls build/test-results/jvmTest/
 
       - name: Test Report
         uses: dorny/test-reporter@v1
