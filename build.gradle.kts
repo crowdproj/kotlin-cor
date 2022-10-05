@@ -57,6 +57,7 @@ kotlin {
 
     sourceSets {
         val coroutinesVersion: String by project
+        val atomicfuVersion: String by project
 
         all { languageSettings.optIn("kotlin.RequiresOptIn") }
 
@@ -74,6 +75,7 @@ kotlin {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+                implementation("org.jetbrains.kotlinx:atomicfu:$atomicfuVersion")
             }
         }
 
@@ -101,7 +103,9 @@ kotlin {
         @Suppress("UNUSED_VARIABLE")
         val jvmTest by getting {
             dependencies {
-                implementation(kotlin("test-junit"))
+                implementation(kotlin("test-junit5"))
+                implementation("io.kotlintest:kotlintest-runner-junit5:3.3.2")
+                runtimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
             }
         }
 
@@ -185,14 +189,15 @@ tasks {
         dependsOn(publish)
     }
 
-    this.forEach {
-        println("${it.name} ${it::class}")
-    }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinTest> {
+//    this.forEach {
+//        println("${it.name} ${it::class}")
+//    }
+    withType<Test> {
+        useJUnitPlatform()
         reports {
-            html.required.set(true)
             junitXml.required.set(true)
         }
+        setupTestLogging()
     }
 
     publish {
@@ -205,4 +210,39 @@ tasks {
 //        dependsOn(closeAndReleaseRepository)
     }
 
+}
+
+fun Test.setupTestLogging() {
+    testLogging {
+        events(
+            org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT,
+        )
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+
+        addTestListener(object : TestListener {
+            override fun beforeSuite(suite: TestDescriptor) {}
+            override fun beforeTest(testDescriptor: TestDescriptor) {}
+            override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+            override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+                if (suite.parent != null) { // will match the outermost suite
+                    val output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
+                    val startItem = "|  "
+                    val endItem = "  |"
+                    val repeatLength = startItem.length + output.length + endItem.length
+                    val messages = """
+                        ${(1..repeatLength).joinToString("") { "-" }}
+                        $startItem$output$endItem
+                        ${(1..repeatLength).joinToString("") { "-" }}
+                    """.trimIndent()
+                    println(messages)
+                }
+            }
+        })
+    }
 }
