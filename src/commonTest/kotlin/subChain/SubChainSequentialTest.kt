@@ -5,6 +5,7 @@ import com.crowdproj.kotlin.cor.handlers.worker
 import com.crowdproj.kotlin.cor.helper.TestContext
 import com.crowdproj.kotlin.cor.helper.TestSubContext
 import com.crowdproj.kotlin.cor.rootChain
+import kotlinx.atomicfu.update
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -38,7 +39,7 @@ class SubChainSequentialTest {
                 chain.exec(ctx)
             }
             println("TIME: $t")
-            assertEquals("0;1;2;3;4;5;6;7;8;9;", ctx.text)
+            assertEquals("0;1;2;3;4;5;6;7;8;9;", ctx.atomicText.value)
         }
     }
 
@@ -50,7 +51,7 @@ class SubChainSequentialTest {
                 chain.exec(ctx)
             }
             println("TIME: $t")
-            assertEquals("9;8;7;6;5;4;3;2;1;0;", ctx.text)
+            assertEquals("9;8;7;6;5;4;3;2;1;0;", ctx.atomicText.value)
         }
     }
 
@@ -81,12 +82,12 @@ class SubChainSequentialTest {
                 }
                 worker("") { println("START: $str") }
                 worker("") { val del = 100 - str.toLong() * 10; println("$str $del"); delay(del); str += ";" }
-                worker("") { parent.text += str }
+                worker("") { parent.atomicText.update { it + str } }
                 worker("") { println("STOP: $str") }
             }
             subChain<TestContext, TestSubContext> {
                 title = "Check parallel execution of data"
-                buffer(10)
+                buffer(11)
                 on { some == 3 }
                 split {
                     val str = text
@@ -94,7 +95,7 @@ class SubChainSequentialTest {
                     str.map { TestSubContext(str = it.toString(), parent = this) }.asFlow()
                 }
                 worker("") { val del = 1000 - str.toLong() * 100; println("$str $del"); delay(del); str += ";" }
-                worker("") { parent.text += str }
+                worker("") { parent.atomicText.update { it + str } }
             }
         }.build()
     }
