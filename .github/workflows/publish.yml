@@ -40,7 +40,7 @@ jobs:
           NEXUS_PASS: ${{ secrets.OSSRH_PASS }}
         #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          arguments: --stacktrace build deploy -Psigning.keyId=${{secrets.OSSRH_SIGNING_KEY_ID}} -Psigning.password='${{secrets.OSSRH_GPG_SECRET_KEY_PASSWORD}}' -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg)
+          arguments: --stacktrace deploy -Psigning.keyId=${{secrets.OSSRH_SIGNING_KEY_ID}} -Psigning.password='${{secrets.OSSRH_GPG_SECRET_KEY_PASSWORD}}' -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg)
 #      - name: Publish package
 #        run: ./gradlew --stacktrace deploy -Psigning.keyId=${{secrets.OSSRH_SIGNING_KEY_ID}} -Psigning.password='${{secrets.OSSRH_GPG_SECRET_KEY_PASSWORD}}' -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg)
 #        env:

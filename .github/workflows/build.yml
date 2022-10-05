@@ -19,8 +19,8 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-#    runs-on: ubuntu-latest
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+#    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -43,7 +43,7 @@ jobs:
       - name: Run Tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: allTests deploy
+          arguments: allTests
 
 #      - name: List Tests
 #        run: ls .;echo "---build";ls build/;echo "---test-results"; ls build/test-results/;echo "---jvmTest"; ls build/test-results/jvmTest/
