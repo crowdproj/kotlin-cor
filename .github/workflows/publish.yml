@@ -25,7 +25,7 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
       - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
+        uses: gradle/wrapper-validation-action@v1
       - name: Decode
         run: |
           mkdir -p ~/.gradle
@@ -40,7 +40,7 @@ jobs:
           NEXUS_PASS: ${{ secrets.OSSRH_PASS }}
         #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          arguments: --stacktrace deploy -Psigning.keyId=${{secrets.OSSRH_SIGNING_KEY_ID}} -Psigning.password='${{secrets.OSSRH_GPG_SECRET_KEY_PASSWORD}}' -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg)
+          arguments: --stacktrace build deploy -Psigning.keyId=${{secrets.OSSRH_SIGNING_KEY_ID}} -Psigning.password='${{secrets.OSSRH_GPG_SECRET_KEY_PASSWORD}}' -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg)
 #      - name: Publish package
 #        run: ./gradlew --stacktrace deploy -Psigning.keyId=${{secrets.OSSRH_SIGNING_KEY_ID}} -Psigning.password='${{secrets.OSSRH_GPG_SECRET_KEY_PASSWORD}}' -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg)
 #        env:
@@ -48,11 +48,11 @@ jobs:
 #          NEXUS_USER: ${{ secrets.OSSRH_USER }}
 #          NEXUS_PASS: ${{ secrets.OSSRH_PASS }}
 ##          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Report unit tests
-        uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name: Gradle Tests
-          path: '**/build/test-results/*/TEST-*.xml'
-          reporter: java-junit
-          fail-on-error: true
+#      - name: Report unit tests
+#        uses: dorny/test-reporter@v1
+#        if: always()
+#        with:
+#          name: Gradle Tests
+#          path: '**/build/test-results/*/TEST-*.xml'
+#          reporter: java-junit
+#          fail-on-error: true
