@@ -57,6 +57,7 @@ kotlin {
 
     sourceSets {
         val coroutinesVersion: String by project
+        val atomicfuVersion: String by project
 
         all { languageSettings.optIn("kotlin.RequiresOptIn") }
 
@@ -74,6 +75,7 @@ kotlin {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+                implementation("org.jetbrains.kotlinx:atomicfu:$atomicfuVersion")
             }
         }
 
