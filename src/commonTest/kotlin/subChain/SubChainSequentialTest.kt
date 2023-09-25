@@ -65,7 +65,7 @@ class SubChainSequentialTest {
                     text = ""
                     str.map { TestSubContext(str = it.toString(), parent = this) }.asFlow()
                 }
-                worker("") { delay(100); str += "_w1" }
+                worker("") { delay(200); str += "_w1" }
                 worker("") { delay(20); str += "_w2" }
                 join {
                     text += it.str
@@ -81,7 +81,7 @@ class SubChainSequentialTest {
                     str.map { TestSubContext(str = it.toString(), parent = this) }.asFlow()
                 }
                 worker("") { println("START: $str") }
-                worker("") { val del = 100 - str.toLong() * 10; println("$str $del"); delay(del); str += ";" }
+                worker("") { val del = 200 - str.toLong() * 20; println("$str $del"); delay(del); str += ";" }
                 worker("") { parent.atomicText.update { it + str } }
                 worker("") { println("STOP: $str") }
             }
