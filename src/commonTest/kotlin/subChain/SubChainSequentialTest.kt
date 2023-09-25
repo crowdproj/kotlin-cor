@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
@@ -45,13 +46,18 @@ class SubChainSequentialTest {
 
     @Test
     fun parallelData() = runTest {
+        val symbols = "0123456789"
         withContext(Dispatchers.Default) {
-            val ctx = TestContext(text = "0123456789", some = 3)
+            val ctx = TestContext(text = symbols, some = 3)
             val t = measureTime {
                 chain.exec(ctx)
             }
             println("TIME: $t")
-            assertEquals("9;8;7;6;5;4;3;2;1;0;", ctx.atomicText.value)
+            // In parallel mode the order is not guaranteed
+            symbols.forEach {
+                assertContains(ctx.atomicText.value, "$it;")
+            }
+
         }
     }
 
@@ -94,7 +100,7 @@ class SubChainSequentialTest {
                     text = ""
                     str.map { TestSubContext(str = it.toString(), parent = this) }.asFlow()
                 }
-                worker("") { val del = 1000 - str.toLong() * 100; println("$str $del"); delay(del); str += ";" }
+                worker("") { val del = 20 - str.toLong() * 2; println("$str $del"); delay(del); str += ";" }
                 worker("") { parent.atomicText.update { it + str } }
             }
         }.build()
