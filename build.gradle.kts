@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.crowdproj"
-version = "0.5.5"
+version = "0.5.6"
 
 repositories {
     mavenCentral()
@@ -24,13 +24,13 @@ nexusStaging {
 }
 
 kotlin {
-    js(BOTH) {
+    js {
         browser()
         nodejs()
     }
     jvm()
     linuxX64()
-//    linuxArm64()
+    linuxArm64()
 //    linuxArm32Hfp()
 //    linuxMips32()
 //    linuxMipsel32()
@@ -48,7 +48,6 @@ kotlin {
     watchosArm32()
     watchosSimulatorArm64()
     watchosArm64()
-    watchosX86()
     watchosX64()
 //    wasm()
 //    wasm32()
@@ -61,7 +60,6 @@ kotlin {
 
         all { languageSettings.optIn("kotlin.RequiresOptIn") }
 
-        @Suppress("UNUSED_VARIABLE")
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
@@ -69,7 +67,6 @@ kotlin {
             }
         }
 
-        @Suppress("UNUSED_VARIABLE")
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test-common"))
@@ -79,28 +76,24 @@ kotlin {
             }
         }
 
-        @Suppress("UNUSED_VARIABLE")
         val jsMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-js"))
             }
         }
 
-        @Suppress("UNUSED_VARIABLE")
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
             }
         }
 
-        @Suppress("UNUSED_VARIABLE")
         val jvmMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
             }
         }
 
-        @Suppress("UNUSED_VARIABLE")
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit5"))
@@ -109,14 +102,12 @@ kotlin {
             }
         }
 
-        @Suppress("UNUSED_VARIABLE")
         val linuxX64Main by getting {
             dependencies {
                 implementation(kotlin("stdlib"))
             }
         }
 
-        @Suppress("UNUSED_VARIABLE")
         val linuxX64Test by getting {
             dependencies {
                 implementation(kotlin("test"))
