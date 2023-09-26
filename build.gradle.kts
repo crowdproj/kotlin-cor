@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.crowdproj"
-version = "0.5.6"
+version = "0.5.7"
 
 repositories {
     mavenCentral()
@@ -31,13 +31,10 @@ kotlin {
     jvm()
     linuxX64()
     linuxArm64()
-//    linuxArm32Hfp()
-//    linuxMips32()
-//    linuxMipsel32()
     ios()
     iosX64()
     iosArm64()
-    iosSimulatorArm64()
+//    iosSimulatorArm64()
     macosX64()
     macosArm64()
     tvos()
@@ -51,7 +48,6 @@ kotlin {
     watchosX64()
 //    wasm()
 //    wasm32()
-//    mingwX86()
     mingwX64()
 
     sourceSets {
@@ -147,7 +143,10 @@ publishing {
             artifact(javadocJar)
             pom {
                 name.set("Kotlin CoR")
-                description.set("Chain of Responsibility Design Template Library for human readable business logic: $name platform")
+                description.set(
+                    "Chain of Responsibility Design Template Library for human readable business " +
+                            "logic: $name platform"
+                )
                 url.set("https://github.com/crowdproj/kotlin-cor")
                 licenses {
                     license {
@@ -180,9 +179,6 @@ tasks {
         dependsOn(publish)
     }
 
-//    this.forEach {
-//        println("${it.name} ${it::class}")
-//    }
     withType<Test> {
         useJUnitPlatform()
         reports {
@@ -198,9 +194,7 @@ tasks {
     create("deploy") {
         group = "build"
         dependsOn(publish)
-//        dependsOn(closeAndReleaseRepository)
     }
-
 }
 
 fun Test.setupTestLogging() {
@@ -222,7 +216,9 @@ fun Test.setupTestLogging() {
             override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
             override fun afterSuite(suite: TestDescriptor, result: TestResult) {
                 if (suite.parent != null) { // will match the outermost suite
-                    val output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
+                    val output = "Results: ${result.resultType} (${result.testCount} tests, " +
+                            "${result.successfulTestCount} passed, ${result.failedTestCount} failed, " +
+                            "${result.skippedTestCount} skipped)"
                     val startItem = "|  "
                     val endItem = "  |"
                     val repeatLength = startItem.length + output.length + endItem.length
