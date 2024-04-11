@@ -4,22 +4,22 @@ import com.crowdproj.kotlin.cor.*
 import com.crowdproj.kotlin.cor.base.BaseCorWorkerDsl
 
 @CorDslMarker
-fun <T> ICorAddExecDsl<T>.worker(
-    function: CorWorkerDsl<T>.() -> Unit
+fun <T,C> ICorAddExecDsl<T,C>.worker(
+    function: CorWorkerDsl<T,C>.() -> Unit
 ) {
     add(
-        CorWorkerDsl<T>().apply(function)
+        CorWorkerDsl<T,C>(this.config).apply(function)
     )
 }
 
 @CorDslMarker
-fun <T> ICorAddExecDsl<T>.worker(
+fun <T,C> ICorAddExecDsl<T,C>.worker(
     title: String,
     description: String = "",
     function: suspend T.() -> Unit
 ) {
     add(
-        CorWorkerDsl<T>().apply {
+        CorWorkerDsl<T,C>(this.config).apply {
             this.title = title
             this.description = description
             this.handle(function)
@@ -43,7 +43,7 @@ class CorWorker<T>(
  * DLS context of a single execution. Cannot be expanded by other chains.
  */
 @CorDslMarker
-class CorWorkerDsl<T>() : BaseCorWorkerDsl<T>() {
+class CorWorkerDsl<T,C>(config: C) : BaseCorWorkerDsl<T,C>(config) {
 
     override fun build(): ICorExec<T> = CorWorker<T>(
         title = title,

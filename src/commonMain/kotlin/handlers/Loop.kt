@@ -7,20 +7,20 @@ import com.crowdproj.kotlin.cor.base.BaseCorChain
 import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
 
 @CorDslMarker
-fun <T> ICorAddExecDsl<T>.loopWhile(
-    function: CorLoopDsl<T>.() -> Unit
+fun <T,C> ICorAddExecDsl<T,C>.loopWhile(
+    function: CorLoopDsl<T,C>.() -> Unit
 ) {
     add(
-        CorLoopDsl<T>(checkBefore = true).apply(function)
+        CorLoopDsl<T,C>(this.config, checkBefore = true).apply(function)
     )
 }
 
 @CorDslMarker
-fun <T> ICorAddExecDsl<T>.loopUntil(
-    function: CorLoopDsl<T>.() -> Unit
+fun <T,C> ICorAddExecDsl<T,C>.loopUntil(
+    function: CorLoopDsl<T,C>.() -> Unit
 ) {
     add(
-        CorLoopDsl<T>(checkBefore = false).apply(function)
+        CorLoopDsl<T,C>(this.config, checkBefore = false).apply(function)
     )
 }
 
@@ -69,10 +69,11 @@ class CorLoop<T>(
 }
 
 @CorDslMarker
-class CorLoopDsl<T>(
+class CorLoopDsl<T,C>(
+    config: C,
     private val checkBefore: Boolean,
     var blockCheck: suspend T.() -> Boolean = { true },
-) : BaseCorChainDsl<T,T>() {
+) : BaseCorChainDsl<T,T,C>(config) {
     override fun build(): ICorExec<T> = CorLoop(
         checkBefore,
         title = title,

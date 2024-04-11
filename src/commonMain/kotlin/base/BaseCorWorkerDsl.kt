@@ -2,13 +2,14 @@ package com.crowdproj.kotlin.cor.base
 
 import com.crowdproj.kotlin.cor.*
 
-abstract class BaseCorWorkerDsl<T>(
+abstract class BaseCorWorkerDsl<T,C>(
+    override val config: C,
     override var title: String = "",
     override var description: String = "",
     protected var blockOn: suspend T.() -> Boolean = { true },
     protected var blockHandle: suspend T.() -> Unit = {},
     protected var blockExcept: suspend T.(e: Throwable) -> Unit = { e: Throwable -> throw e },
-) : ICorExecDsl<T>, ICorOnDsl<T>, ICorExceptDsl<T>, ICorHandleDsl<T> {
+) : ICorExecDsl<T,C>, ICorOnDsl<T>, ICorExceptDsl<T>, ICorHandleDsl<T,C> {
 
     abstract override fun build(): ICorExec<T>
 

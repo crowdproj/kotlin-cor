@@ -9,8 +9,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @CorDslMarker
-fun <T> ICorAddExecDsl<T>.parallel(function: CorParallelDsl<T>.() -> Unit) {
-    add(CorParallelDsl<T>().apply(function))
+fun <T,C> ICorAddExecDsl<T,C>.parallel(function: CorParallelDsl<T,C>.() -> Unit) {
+    add(CorParallelDsl<T,C>(this.config).apply(function))
 }
 
 class CorParallel<T>(
@@ -40,7 +40,7 @@ class CorParallel<T>(
  * Chains are started simultaneously and executed in parallel.
  */
 @CorDslMarker
-class CorParallelDsl<T>(): BaseCorChainDsl<T,T>() {
+class CorParallelDsl<T,C>(config: C): BaseCorChainDsl<T,T,C>(config) {
     override fun build(): ICorExec<T> = CorParallel(
         title = title,
         description = description,

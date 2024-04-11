@@ -7,8 +7,8 @@ import com.crowdproj.kotlin.cor.base.BaseCorChain
 import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
 
 @CorDslMarker
-fun <T> ICorAddExecDsl<T>.chain(function: CorChainDsl<T>.() -> Unit) {
-    add(CorChainDsl<T>().apply(function))
+fun <T,C> ICorAddExecDsl<T,C>.chain(function: CorChainDsl<T,C>.() -> Unit) {
+    add(CorChainDsl<T,C>(this.config).apply(function))
 }
 
 class CorChain<T>(
@@ -34,7 +34,7 @@ class CorChain<T>(
  * The chains are executed sequentially.
  */
 @CorDslMarker
-class CorChainDsl<T>() : BaseCorChainDsl<T,T>() {
+class CorChainDsl<T,C>(config: C) : BaseCorChainDsl<T,T,C>(config) {
     override fun build(): ICorExec<T> = CorChain(
         title = title,
         description = description,

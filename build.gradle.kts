@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+
 plugins {
     kotlin("multiplatform")
     `maven-publish`
@@ -7,7 +9,7 @@ plugins {
 }
 
 group = "com.crowdproj"
-version = "0.5.7"
+version = "0.6.0"
 
 repositories {
     mavenCentral()
@@ -31,23 +33,23 @@ kotlin {
     jvm()
     linuxX64()
     linuxArm64()
-    ios()
     iosX64()
     iosArm64()
 //    iosSimulatorArm64()
     macosX64()
     macosArm64()
-    tvos()
     tvosArm64()
     tvosSimulatorArm64()
     tvosX64()
-    watchos()
     watchosArm32()
     watchosSimulatorArm64()
     watchosArm64()
     watchosX64()
-//    wasm()
-//    wasm32()
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        nodejs()
+    }
     mingwX64()
 
     sourceSets {

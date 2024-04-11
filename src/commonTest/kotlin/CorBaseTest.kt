@@ -58,7 +58,7 @@ class CorBaseTest {
     }
 }
 
-private fun ICorAddExecDsl<TestContext>.printResult() = worker(title = "Print example") {
+private fun ICorAddExecDsl<TestContext, Unit>.printResult() = worker(title = "Print example") {
     println("some = $some")
 }
 

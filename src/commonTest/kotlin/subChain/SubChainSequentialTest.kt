@@ -7,7 +7,6 @@ import com.crowdproj.kotlin.cor.helper.TestSubContext
 import com.crowdproj.kotlin.cor.rootChain
 import kotlinx.atomicfu.update
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.test.runTest
@@ -15,10 +14,8 @@ import kotlinx.coroutines.withContext
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
-import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class SubChainSequentialTest {
     @Test
     fun sequentialWorkers() = runTest {
@@ -63,7 +60,7 @@ class SubChainSequentialTest {
 
     companion object {
         val chain = rootChain<TestContext> {
-            subChain<TestContext, TestSubContext> {
+            subChain<TestContext, TestSubContext, Unit> {
                 title = "Check sequential execution of workers"
                 on { some == 1 }
                 split {
@@ -77,7 +74,7 @@ class SubChainSequentialTest {
                     text += it.str
                 }
             }
-            subChain<TestContext, TestSubContext> {
+            subChain<TestContext, TestSubContext, Unit> {
                 title = "Check sequential execution of data"
                 on { some == 2 }
                 buffer(0)
@@ -91,7 +88,7 @@ class SubChainSequentialTest {
                 worker("") { parent.atomicText.update { it + str } }
                 worker("") { println("STOP: $str") }
             }
-            subChain<TestContext, TestSubContext> {
+            subChain<TestContext, TestSubContext, Unit> {
                 title = "Check parallel execution of data"
                 buffer(11)
                 on { some == 3 }
