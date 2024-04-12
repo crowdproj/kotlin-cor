@@ -162,15 +162,16 @@ tasks {
         dependsOn(publish)
     }
 
-    val linkDebugTestIosSimulatorArm64: Task by getting {
-        dependsOn("signIosSimulatorArm64Publication")
-    }
-
     withType<Test> {
         reports {
             junitXml.required.set(true)
         }
         setupTestLogging()
+    }
+
+    withType<AbstractPublishToMaven>().configureEach {
+        val signingTasks = withType<Sign>()
+        mustRunAfter(signingTasks)
     }
 
     publish {
