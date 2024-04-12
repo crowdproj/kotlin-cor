@@ -5,12 +5,10 @@ import com.crowdproj.kotlin.cor.handlers.parallel
 import com.crowdproj.kotlin.cor.handlers.worker
 import com.crowdproj.kotlin.cor.helper.CorStatuses
 import com.crowdproj.kotlin.cor.helper.TestContext
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class CorBaseTest {
     @Test
     fun createCor() = runTest {

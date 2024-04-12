@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
@@ -48,7 +50,6 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
-        nodejs()
     }
     mingwX64()
 
@@ -58,14 +59,14 @@ kotlin {
 
         all { languageSettings.optIn("kotlin.RequiresOptIn") }
 
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(kotlin("stdlib-common"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             }
         }
 
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
@@ -74,39 +75,19 @@ kotlin {
             }
         }
 
-        val jsMain by getting {
+        jsTest {
             dependencies {
-                implementation(kotlin("stdlib-js"))
+                implementation(kotlin("test"))
             }
         }
 
-        val jsTest by getting {
+        val wasmJsTest by getting {
             dependencies {
-                implementation(kotlin("test-js"))
+                implementation(kotlin("test"))
             }
         }
 
-        val jvmMain by getting {
-            dependencies {
-                implementation(kotlin("stdlib-jdk8"))
-            }
-        }
-
-        val jvmTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit5"))
-                implementation("io.kotlintest:kotlintest-runner-junit5:3.3.2")
-                runtimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
-            }
-        }
-
-        val linuxX64Main by getting {
-            dependencies {
-                implementation(kotlin("stdlib"))
-            }
-        }
-
-        val linuxX64Test by getting {
+        jvmTest {
             dependencies {
                 implementation(kotlin("test"))
             }
@@ -182,7 +163,6 @@ tasks {
     }
 
     withType<Test> {
-        useJUnitPlatform()
         reports {
             junitXml.required.set(true)
         }
