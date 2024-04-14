@@ -173,7 +173,7 @@ tasks {
         mustRunAfter(withType<Sign>())
     }
 
-    filter { it.name.startsWith("link") }.forEach {
+    filter { it.name.startsWith("link") || it.name.startsWith("compile") }.forEach {
         it.name {
             mustRunAfter(withType<Sign>())
         }
