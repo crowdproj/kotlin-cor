@@ -170,8 +170,13 @@ tasks {
     }
 
     withType<AbstractPublishToMaven>().configureEach {
-        val signingTasks = withType<Sign>()
-        mustRunAfter(signingTasks)
+        mustRunAfter(withType<Sign>())
+    }
+
+    filter { it.name.startsWith("link") }.forEach {
+        it.name {
+            mustRunAfter(withType<Sign>())
+        }
     }
 
     publish {
