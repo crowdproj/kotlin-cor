@@ -29,7 +29,7 @@ class CorSubChainTest {
             worker("init") {
                 some = 0
             }
-            subChain<TestContext, TestSubContext> {
+            subChain<TestContext, TestSubContext, Unit> {
                 buffer(20)
                 on { status == CorStatuses.RUNNING }
                 split { (1..10).asFlow().map { TestSubContext(temp = it) } }

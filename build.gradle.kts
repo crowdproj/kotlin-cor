@@ -1,26 +1,28 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+
 plugins {
-    kotlin("multiplatform")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.plugin.dokka)
     `maven-publish`
-    id("signing")
-    id("org.jetbrains.dokka")
-    id("io.codearte.nexus-staging")
+    signing
 }
 
 group = "com.crowdproj"
-version = "0.5.6"
+version = "0.6.0"
 
 repositories {
     mavenCentral()
 }
 
 signing {
+    useInMemoryPgpKeys(
+        System.getenv("SIGNING_KEY_ID"),
+        System.getenv("SIGNING_KEY"),
+        System.getenv("SIGNING_PASSWORD")
+    )
     sign(publishing.publications)
-}
-
-nexusStaging {
-    serverUrl = "https://s01.oss.sonatype.org/service/local/"
-    packageGroup = "com.crowdproj" //optional if packageGroup == project.getGroup()
-//    stagingProfileId = "yourStagingProfileId" //when not defined will be got from server using "packageGroup"
 }
 
 kotlin {
@@ -31,39 +33,31 @@ kotlin {
     jvm()
     linuxX64()
     linuxArm64()
-//    linuxArm32Hfp()
-//    linuxMips32()
-//    linuxMipsel32()
-    ios()
     iosX64()
     iosArm64()
-    iosSimulatorArm64()
+//    iosSimulatorArm64()
     macosX64()
     macosArm64()
-    tvos()
     tvosArm64()
     tvosSimulatorArm64()
     tvosX64()
-    watchos()
     watchosArm32()
     watchosSimulatorArm64()
     watchosArm64()
     watchosX64()
-//    wasm()
-//    wasm32()
-//    mingwX86()
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
     mingwX64()
 
     sourceSets {
-        val coroutinesVersion: String by project
-        val atomicfuVersion: String by project
-
         all { languageSettings.optIn("kotlin.RequiresOptIn") }
 
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                implementation(libs.coroutines.core)
             }
         }
 
@@ -71,44 +65,24 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
-                implementation("org.jetbrains.kotlinx:atomicfu:$atomicfuVersion")
-            }
-        }
-
-        val jsMain by getting {
-            dependencies {
-                implementation(kotlin("stdlib-js"))
+                implementation(libs.coroutines.test)
+                implementation(libs.atomicfu)
             }
         }
 
         val jsTest by getting {
             dependencies {
-                implementation(kotlin("test-js"))
+                implementation(kotlin("test"))
             }
         }
 
-        val jvmMain by getting {
+        val wasmJsTest by getting {
             dependencies {
-                implementation(kotlin("stdlib-jdk8"))
+                implementation(kotlin("test"))
             }
         }
 
         val jvmTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit5"))
-                implementation("io.kotlintest:kotlintest-runner-junit5:3.3.2")
-                runtimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
-            }
-        }
-
-        val linuxX64Main by getting {
-            dependencies {
-                implementation(kotlin("stdlib"))
-            }
-        }
-
-        val linuxX64Test by getting {
             dependencies {
                 implementation(kotlin("test"))
             }
@@ -117,12 +91,11 @@ kotlin {
 }
 
 val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
-
 val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
     dependsOn(dokkaHtml)
-    group = "publishing"
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
     archiveClassifier.set("javadoc")
-    from(dokkaHtml.outputDirectory)
+    from(dokkaHtml)
 }
 
 publishing {
@@ -140,14 +113,16 @@ publishing {
                 }
             }
         }
-
     }
     publications {
         withType(MavenPublication::class).configureEach {
             artifact(javadocJar)
             pom {
                 name.set("Kotlin CoR")
-                description.set("Chain of Responsibility Design Template Library for human readable business logic: $name platform")
+                description.set(
+                    "Chain of Responsibility Design Template Library for human readable business " +
+                            "logic: $name platform"
+                )
                 url.set("https://github.com/crowdproj/kotlin-cor")
                 licenses {
                     license {
@@ -176,15 +151,7 @@ publishing {
 }
 
 tasks {
-    closeAndReleaseRepository {
-        dependsOn(publish)
-    }
-
-//    this.forEach {
-//        println("${it.name} ${it::class}")
-//    }
     withType<Test> {
-        useJUnitPlatform()
         reports {
             junitXml.required.set(true)
         }
@@ -194,13 +161,10 @@ tasks {
     publish {
         dependsOn(build)
     }
-
     create("deploy") {
         group = "build"
         dependsOn(publish)
-//        dependsOn(closeAndReleaseRepository)
     }
-
 }
 
 fun Test.setupTestLogging() {
@@ -222,7 +186,9 @@ fun Test.setupTestLogging() {
             override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
             override fun afterSuite(suite: TestDescriptor, result: TestResult) {
                 if (suite.parent != null) { // will match the outermost suite
-                    val output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
+                    val output = "Results: ${result.resultType} (${result.testCount} tests, " +
+                            "${result.successfulTestCount} passed, ${result.failedTestCount} failed, " +
+                            "${result.skippedTestCount} skipped)"
                     val startItem = "|  "
                     val endItem = "  |"
                     val repeatLength = startItem.length + output.length + endItem.length

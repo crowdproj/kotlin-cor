@@ -3,7 +3,11 @@ package com.crowdproj.kotlin.cor
 import com.crowdproj.kotlin.cor.handlers.CorChainDsl
 import com.crowdproj.kotlin.cor.handlers.CorWorkerDsl
 
-interface ICorExecDsl<T> {
+interface ICorConfigurable<C> {
+    val config: C
+}
+
+interface ICorExecDsl<T,C>: ICorConfigurable<C> {
     var title: String
     var description: String
     fun build(): ICorExec<T>
@@ -17,11 +21,11 @@ interface ICorExceptDsl<T> {
     fun except(function: suspend T.(e: Throwable) -> Unit)
 }
 
-interface ICorAddExecDsl<T> {
-    fun add(worker: ICorExecDsl<T>)
+interface ICorAddExecDsl<T,C>: ICorConfigurable<C> {
+    fun add(worker: ICorExecDsl<T,C>)
 }
 
-interface ICorHandleDsl<T> {
+interface ICorHandleDsl<T,C> {
     fun handle(function: suspend T.() -> Unit)
 }
 
@@ -47,6 +51,8 @@ interface ICorWorker<T> : ICorExec<T> {
     }
 }
 
-fun <T> rootChain(function: CorChainDsl<T>.() -> Unit) = CorChainDsl<T>().apply(function)
-fun <T> rootWorker(function: CorWorkerDsl<T>.() -> Unit) = CorWorkerDsl<T>().apply(function)
+fun <T> rootChain(function: CorChainDsl<T,Unit>.() -> Unit) = CorChainDsl<T,Unit>(Unit).apply(function)
+fun <T,C> rootChain(config: C, function: CorChainDsl<T,C>.() -> Unit) = CorChainDsl<T,C>(config).apply(function)
+fun <T> rootWorker(function: CorWorkerDsl<T,Unit>.() -> Unit) = CorWorkerDsl<T,Unit>(Unit).apply(function)
+fun <T,C> rootWorker(config: C, function: CorWorkerDsl<T,C>.() -> Unit) = CorWorkerDsl<T,C>(config).apply(function)
 

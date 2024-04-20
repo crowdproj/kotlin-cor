@@ -2,13 +2,11 @@ package com.crowdproj.kotlin.cor
 
 import com.crowdproj.kotlin.cor.helper.CorStatuses
 import com.crowdproj.kotlin.cor.helper.TestContext
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class CorTest {
 
     @Test

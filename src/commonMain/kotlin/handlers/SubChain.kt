@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 
 @CorDslMarker
-fun <T, K> ICorAddExecDsl<T>.subChain(function: CorSubChainDsl<T, K>.() -> Unit) {
-    add(CorSubChainDsl<T, K>().apply(function))
+fun <T, K, C> ICorAddExecDsl<T,C>.subChain(function: CorSubChainDsl<T, K, C>.() -> Unit) {
+    add(CorSubChainDsl<T, K, C>(this.config).apply(function))
 }
 
 class CorSubChain<T, K>(
@@ -47,8 +47,7 @@ class CorSubChain<T, K>(
  * It can be expanded by other chains.
  */
 @CorDslMarker
-class CorSubChainDsl<T, K>(
-) : BaseCorChainDsl<T, K>() {
+class CorSubChainDsl<T, K, C>(config: C) : BaseCorChainDsl<T, K, C>(config) {
     private var blockSplit: suspend T.() -> Flow<K> = { emptyFlow() }
     private var blockJoin: suspend T.(K) -> Unit = {}
     private var bufferSize: Int = 0

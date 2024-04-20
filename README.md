@@ -31,16 +31,48 @@ bizLogics.exec(ctx)
 assertEquals(expected, ctx.objResponse)
 ```
 
+Other option includes also custom settings of the pipeline that can be used during initialization and processing:
+
+```kotlin
+val settings = BizSettings(
+    repo = PostgresRepo(),
+    loggerProvider = { clazz: String -> LoggerFactory.getLogger(clazz) },
+)
+val bizLogics = rootChain<BizContext, CorSettings>(settings) {
+    readObject("Object reading from DB")
+}
+fun ICorDslAdd<BizContext, BizSettings>.readObject(title: String) = worker {
+    this.title = title
+    this.description = """
+     This worker handles reading object in question from DB.
+     The mandatory parameter is ID
+   """
+    // Getting content of BizSettings to this.config, 
+    // so that logger initialized during configuration step
+    val logger = this.config.loggerProvider("readObject")
+    on { state == RUNNING }
+    handle {
+        // But we can use logger in runtime area
+        logger.info("Handling $title")
+        objectRead = config.repo.read(this.toReadRequest())
+    }
+    except { e: Throwable ->
+        fail(e.toError())
+        logger.error("Error reading object from DB", e)
+    }
+}
+```
+
 Such a representation of the business logics has the following advantages.
 
 1. It is optimized for human readability. So, any developer will easily find the required operation.
-2. It is extremely agile and allows easily change the business process without substantial refactoring.
-3. Provides "code first" approach that is better suit the needs of developers.
+2. It is extremely agile and allows easy change of the business process without substantial refactoring.
+3. Provides "code first" approach that better suits the needs of developers.
 
 ### CoR vs BPMS
 
-BPMS engines provide a "declaration first" approach where business logics is developed in a visual designer. This is
-may be very convenient for analysts, architects or manager but brings few disadvantages to developers. The main problem
+BPMS engines provide a "declaration first" approach where business logics is developed in a visual designer. This
+may be very convenient for analysts, architects or managers but brings few disadvantages to developers. The main problem
 is current engines use a schema: Visual Editor -> xml spec -> code.
 
 1. This means that developers do not control the code. Any change by an analyst to BPM schema may break your application
@@ -50,9 +82,15 @@ is current engines use a schema: Visual Editor -> xml spec -> code.
 
 This CoR library doesn't compete with BPM as is. But it allows developers to control the code themselves.
 
-Compatibility between BPM and CoR is planned.
+Compatibility between BPM code generators and CoR is planned.
 
 ## Installation
+
+#### **`libs.versions.toml`**
+```toml
+[libraries]
+cor = "com.crowdproj:kotlin-cor:0.6.0"
+```
 
 #### **`build.gradle.kts`**
 
@@ -62,15 +100,8 @@ repositories {
 }
 
 dependencies {
-    val kotlinCorVersion: String by project
-    implementation("com.crowdproj:kotlin-cor:$kotlinCorVersion")
+    implementation(libs.cor)
 }
-```
-
-#### **`gradle.properties`**
-
-```properties
-kotlinCorVersion=0.5.5+
 ```
 
 ## Usage
@@ -79,6 +110,7 @@ First, build a business chain
 
 ```kotlin
 val chain = rootChain<TestContext> {
+    // This is a simple worker
     worker {
         title = "Status initialization"
         description = "Check the status initialization at the buziness chain start"
@@ -88,6 +120,7 @@ val chain = rootChain<TestContext> {
         except { status = CorStatuses.FAILING }
     }
 
+    // Chain wraps a series of workers
     chain {
         on { status == CorStatuses.RUNNING }
 
@@ -99,6 +132,7 @@ val chain = rootChain<TestContext> {
         }
     }
 
+    // Nearly the same as `chain` but workers executed in parallel, so the order between them is not guaranteed
     parallel {
         on {
             some < 15
@@ -108,6 +142,8 @@ val chain = rootChain<TestContext> {
             some++
         }
     }
+    // You can represent your workers and chains as Kotlin extensions
+    // In this form they look more compact and easier
     printResult()
 
 }.build()
