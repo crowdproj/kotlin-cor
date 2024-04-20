@@ -29,15 +29,14 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
 
-      - name: Decode
-        run: |
-          mkdir -p ~/.gradle
-          echo "${{secrets.OSSRH_SIGNING_SECRET_KEY_RING_FILE}}" > ~/.gradle/secring.gpg.b64
-          base64 -d ~/.gradle/secring.gpg.b64 > ~/.gradle/secring.gpg
-
-      - name: Publish package
-        run: ./gradlew --stacktrace deploy -Psigning.keyId=${{secrets.OSSRH_SIGNING_KEY_ID}} -Psigning.password='${{secrets.OSSRH_GPG_SECRET_KEY_PASSWORD}}' -Psigning.secretKeyRingFile=$(echo ~/.gradle/secring.gpg)
+      - name: Publish
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: deploy
         env:
+          SIGNING_KEY_ID: ${{ secrets.OSSRH_SIGNING_KEY_ID }}
+          SIGNING_KEY: ${{ secrets.OSSRH_SIGNING_SECRET_KEY_RING_FILE }}
+          SIGNING_PASSWORD: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
           NEXUS_HOST: ${{ secrets.OSSRH_HOST }}
           NEXUS_USER: ${{ secrets.OSSRH_USER }}
           NEXUS_PASS: ${{ secrets.OSSRH_PASS }}

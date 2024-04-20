@@ -1,0 +1,15 @@
+[versions]
+kotlin = "1.9.23"
+dokka = "1.9.20"
+nexus-publish-plugin = "2.0.0"
+
+coroutines = "1.8.0"
+
+[libraries]
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.23.2" }
+
+[plugins]
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+plugin-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

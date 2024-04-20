@@ -3,11 +3,10 @@
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
-    kotlin("multiplatform")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.plugin.dokka)
     `maven-publish`
-    id("signing")
-    id("org.jetbrains.dokka")
-    id("io.codearte.nexus-staging")
+    signing
 }
 
 group = "com.crowdproj"
@@ -18,13 +17,12 @@ repositories {
 }
 
 signing {
+    useInMemoryPgpKeys(
+        System.getenv("SIGNING_KEY_ID"),
+        System.getenv("SIGNING_KEY"),
+        System.getenv("SIGNING_PASSWORD")
+    )
     sign(publishing.publications)
-}
-
-nexusStaging {
-    serverUrl = "https://s01.oss.sonatype.org/service/local/"
-    packageGroup = "com.crowdproj" //optional if packageGroup == project.getGroup()
-//    stagingProfileId = "yourStagingProfileId" //when not defined will be got from server using "packageGroup"
 }
 
 kotlin {
@@ -54,28 +52,25 @@ kotlin {
     mingwX64()
 
     sourceSets {
-        val coroutinesVersion: String by project
-        val atomicfuVersion: String by project
-
         all { languageSettings.optIn("kotlin.RequiresOptIn") }
 
-        commonMain {
+        val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                implementation(libs.coroutines.core)
             }
         }
 
-        commonTest {
+        val commonTest by getting {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
-                implementation("org.jetbrains.kotlinx:atomicfu:$atomicfuVersion")
+                implementation(libs.coroutines.test)
+                implementation(libs.atomicfu)
             }
         }
 
-        jsTest {
+        val jsTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }
@@ -87,7 +82,7 @@ kotlin {
             }
         }
 
-        jvmTest {
+        val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }
@@ -96,12 +91,11 @@ kotlin {
 }
 
 val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
-
 val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
     dependsOn(dokkaHtml)
-    group = "publishing"
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
     archiveClassifier.set("javadoc")
-    from(dokkaHtml.outputDirectory)
+    from(dokkaHtml)
 }
 
 publishing {
@@ -119,7 +113,6 @@ publishing {
                 }
             }
         }
-
     }
     publications {
         withType(MavenPublication::class).configureEach {
@@ -158,10 +151,6 @@ publishing {
 }
 
 tasks {
-    closeAndReleaseRepository {
-        dependsOn(publish)
-    }
-
     withType<Test> {
         reports {
             junitXml.required.set(true)
@@ -169,20 +158,9 @@ tasks {
         setupTestLogging()
     }
 
-    withType<AbstractPublishToMaven>().configureEach {
-        mustRunAfter(withType<Sign>())
-    }
-
-    filter { it.name.startsWith("link") || it.name.startsWith("compile") }.forEach {
-        it.name {
-            mustRunAfter(withType<Sign>())
-        }
-    }
-
     publish {
         dependsOn(build)
     }
-
     create("deploy") {
         group = "build"
         dependsOn(publish)
