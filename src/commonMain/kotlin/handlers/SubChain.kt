@@ -5,12 +5,12 @@ import com.crowdproj.kotlin.cor.ICorAddExecDsl
 import com.crowdproj.kotlin.cor.ICorExec
 import com.crowdproj.kotlin.cor.base.BaseCorChain
 import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
-import kotlinx.coroutines.async
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flow
 
 fun <T, K, C> ICorAddExecDsl<T,C>.subChain(function: CorSubChainDsl<T, K, C>.() -> Unit) {
     add(CorSubChainDsl<T, K, C>(this.config).apply(function))
@@ -34,11 +34,18 @@ class CorSubChain<T, K>(
 ) {
 
     override suspend fun handle(context: T): Unit = coroutineScope {
+        @OptIn(ExperimentalCoroutinesApi::class)
         context
             .blockSplit()
-            .map { subCtx -> async { execs.forEach { it.exec(subCtx) }; subCtx } }
-            .run { if (buffer > 0) buffer(buffer) else this }
-            .collect { context.blockJoin(it.await()) }
+            .flatMapMerge(concurrency = if (buffer > 0) buffer else 1) { subCtx ->
+                flow {
+                    execs.forEach { it.exec(subCtx) }
+                    emit(subCtx)
+                }
+            }
+            .collect {
+                context.blockJoin(it)
+            }
     }
 }
 

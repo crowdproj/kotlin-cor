@@ -66,7 +66,7 @@ kotlin {
     wasmJs {
         browser()
         nodejs()
-        d8()
+//        d8() - due to a bug (CorSubChainTest:createCor, SubChainSequentialTest:parallelData
     }
     wasmWasi {
         nodejs()
