@@ -6,7 +6,6 @@ import com.crowdproj.kotlin.cor.ICorExec
 import com.crowdproj.kotlin.cor.base.BaseCorChain
 import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
 
-@CorDslMarker
 fun <T,C> ICorAddExecDsl<T,C>.loopWhile(
     function: CorLoopDsl<T,C>.() -> Unit
 ) {
@@ -15,7 +14,6 @@ fun <T,C> ICorAddExecDsl<T,C>.loopWhile(
     )
 }
 
-@CorDslMarker
 fun <T,C> ICorAddExecDsl<T,C>.loopUntil(
     function: CorLoopDsl<T,C>.() -> Unit
 ) {
@@ -24,6 +22,7 @@ fun <T,C> ICorAddExecDsl<T,C>.loopUntil(
     )
 }
 
+@CorDslMarker
 class CorLoop<T>(
     private val checkBefore: Boolean,
     private val execs: List<ICorExec<T>>,

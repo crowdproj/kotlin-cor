@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
 class SubChainSequentialTest {
@@ -68,8 +69,8 @@ class SubChainSequentialTest {
                     text = ""
                     str.map { TestSubContext(str = it.toString(), parent = this) }.asFlow()
                 }
-                worker("") { delay(200); str += "_w1" }
-                worker("") { delay(20); str += "_w2" }
+                worker("") { delay(200.milliseconds); str += "_w1" }
+                worker("") { delay(20.milliseconds); str += "_w2" }
                 join {
                     text += it.str
                 }
@@ -84,7 +85,7 @@ class SubChainSequentialTest {
                     str.map { TestSubContext(str = it.toString(), parent = this) }.asFlow()
                 }
                 worker("") { println("START: $str") }
-                worker("") { val del = 200 - str.toLong() * 20; println("$str $del"); delay(del); str += ";" }
+                worker("") { val del = 200 - str.toLong() * 20; println("$str $del"); delay(del.milliseconds); str += ";" }
                 worker("") { parent.atomicText.update { it + str } }
                 worker("") { println("STOP: $str") }
             }
@@ -97,7 +98,7 @@ class SubChainSequentialTest {
                     text = ""
                     str.map { TestSubContext(str = it.toString(), parent = this) }.asFlow()
                 }
-                worker("") { val del = 20 - str.toLong() * 2; println("$str $del"); delay(del); str += ";" }
+                worker("") { val del = 20 - str.toLong() * 2; println("$str $del"); delay(del.milliseconds); str += ";" }
                 worker("") { parent.atomicText.update { it + str } }
             }
         }.build()

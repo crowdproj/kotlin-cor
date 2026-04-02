@@ -89,7 +89,7 @@ Compatibility between BPM code generators and CoR is planned.
 #### **`libs.versions.toml`**
 ```toml
 [libraries]
-cor = "com.crowdproj:kotlin-cor:0.6.0"
+cor = "com.crowdproj:kotlin-cor:1.0.0"
 ```
 
 #### **`build.gradle.kts`**

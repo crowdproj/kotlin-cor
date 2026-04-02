@@ -3,7 +3,6 @@ package com.crowdproj.kotlin.cor.handlers
 import com.crowdproj.kotlin.cor.*
 import com.crowdproj.kotlin.cor.base.BaseCorWorkerDsl
 
-@CorDslMarker
 fun <T,C> ICorAddExecDsl<T,C>.worker(
     function: CorWorkerDsl<T,C>.() -> Unit
 ) {
@@ -12,7 +11,6 @@ fun <T,C> ICorAddExecDsl<T,C>.worker(
     )
 }
 
-@CorDslMarker
 fun <T,C> ICorAddExecDsl<T,C>.worker(
     title: String,
     description: String = "",
@@ -27,6 +25,7 @@ fun <T,C> ICorAddExecDsl<T,C>.worker(
     )
 }
 
+@CorDslMarker
 class CorWorker<T>(
     override val title: String,
     override val description: String = "",

@@ -12,11 +12,11 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 
-@CorDslMarker
 fun <T, K, C> ICorAddExecDsl<T,C>.subChain(function: CorSubChainDsl<T, K, C>.() -> Unit) {
     add(CorSubChainDsl<T, K, C>(this.config).apply(function))
 }
 
+@CorDslMarker
 class CorSubChain<T, K>(
     private val execs: List<ICorExec<K>>,
     title: String,
