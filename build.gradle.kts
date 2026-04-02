@@ -72,10 +72,11 @@ kotlin {
         nodejs()
     }
     mingwX64()
-    androidNativeArm32()
-    androidNativeArm64()
-    androidNativeX64()
-    androidNativeX86()
+// Publications problem in github actions: Received status code 402 from server: Payment Requir
+//    androidNativeArm32()
+//    androidNativeArm64()
+//    androidNativeX64()
+//    androidNativeX86()
 
     sourceSets {
         all { languageSettings.optIn("kotlin.RequiresOptIn") }
