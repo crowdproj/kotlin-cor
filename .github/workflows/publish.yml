@@ -18,6 +18,11 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle' # Добавлено кэширование для ускорения
 
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
       - name: Validate Gradle wrapper
         uses: gradle/actions/wrapper-validation@v3 # Обновлено с v1
 
