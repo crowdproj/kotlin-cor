@@ -6,13 +6,14 @@ import com.crowdproj.kotlin.cor.ICorExec
 import com.crowdproj.kotlin.cor.base.BaseCorChain
 import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
-@CorDslMarker
 fun <T,C> ICorAddExecDsl<T,C>.parallel(function: CorParallelDsl<T,C>.() -> Unit) {
     add(CorParallelDsl<T,C>(this.config).apply(function))
 }
 
+@CorDslMarker
 class CorParallel<T>(
     private val execs: List<ICorExec<T>>,
     title: String,
@@ -30,7 +31,7 @@ class CorParallel<T>(
         execs
             .map { launch { it.exec(context) } }
             .toList()
-            .forEach { it.join() }
+            .joinAll()
     }
 }
 

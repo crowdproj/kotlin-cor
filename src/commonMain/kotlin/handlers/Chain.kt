@@ -6,11 +6,11 @@ import com.crowdproj.kotlin.cor.ICorExec
 import com.crowdproj.kotlin.cor.base.BaseCorChain
 import com.crowdproj.kotlin.cor.base.BaseCorChainDsl
 
-@CorDslMarker
 fun <T,C> ICorAddExecDsl<T,C>.chain(function: CorChainDsl<T,C>.() -> Unit) {
     add(CorChainDsl<T,C>(this.config).apply(function))
 }
 
+@CorDslMarker
 class CorChain<T>(
     private val execs: List<ICorExec<T>>,
     title: String,

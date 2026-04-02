@@ -1,27 +1,43 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.plugin.dokka)
+    alias(libs.plugins.plugin.dokka.javadoc)
     `maven-publish`
     signing
 }
 
 group = "com.crowdproj"
-version = "0.6.0"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
 }
 
+dokka {
+    pluginsConfiguration.html {
+        footerMessage.set("(c) Sergey Okatov")
+        separateInheritedMembers.set(false)
+        mergeImplicitExpectActualDeclarations.set(false)
+    }
+}
+
+// build.gradle.kts
 signing {
-    useInMemoryPgpKeys(
-        System.getenv("SIGNING_KEY_ID"),
-        System.getenv("SIGNING_KEY"),
-        System.getenv("SIGNING_PASSWORD")
-    )
+    sign(publishing.publications)
+}
+
+
+signing {
+    val keyId = System.getenv("SIGNING_KEY_ID")
+    val key = System.getenv("SIGNING_KEY")
+    val pass = System.getenv("SIGNING_PASSWORD")
+    val isRequired = (keyId != null || key != null || pass != null)
+    setRequired(isRequired)
+    useInMemoryPgpKeys(keyId, key, pass)
     sign(publishing.publications)
 }
 
@@ -35,33 +51,37 @@ kotlin {
     linuxArm64()
     iosX64()
     iosArm64()
-//    iosSimulatorArm64()
-    macosX64()
     macosArm64()
     tvosArm64()
     tvosSimulatorArm64()
-    tvosX64()
     watchosArm32()
     watchosSimulatorArm64()
     watchosArm64()
-    watchosX64()
-    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
+        nodejs()
+        d8()
+    }
+    wasmWasi {
+        nodejs()
     }
     mingwX64()
+    androidNativeArm32()
+    androidNativeArm64()
+    androidNativeX64()
+    androidNativeX86()
 
     sourceSets {
         all { languageSettings.optIn("kotlin.RequiresOptIn") }
 
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(kotlin("stdlib-common"))
                 implementation(libs.coroutines.core)
             }
         }
 
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
@@ -70,19 +90,19 @@ kotlin {
             }
         }
 
-        val jsTest by getting {
+        jsTest {
             dependencies {
                 implementation(kotlin("test"))
             }
         }
 
-        val wasmJsTest by getting {
+        wasmJsTest {
             dependencies {
                 implementation(kotlin("test"))
             }
         }
 
-        val jvmTest by getting {
+        jvmTest {
             dependencies {
                 implementation(kotlin("test"))
             }
@@ -90,12 +110,10 @@ kotlin {
     }
 }
 
-val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
-val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
-    dependsOn(dokkaHtml)
-    group = JavaBasePlugin.DOCUMENTATION_GROUP
+val dokkaHtmlJar by tasks.registering(Jar::class) {
+    description = "A Javadoc JAR containing Dokka Javadoc"
+    from(tasks.dokkaGeneratePublicationHtml.flatMap { it.outputDirectory })
     archiveClassifier.set("javadoc")
-    from(dokkaHtml)
 }
 
 publishing {
@@ -116,7 +134,7 @@ publishing {
     }
     publications {
         withType(MavenPublication::class).configureEach {
-            artifact(javadocJar)
+            artifact(dokkaHtmlJar)
             pom {
                 name.set("Kotlin CoR")
                 description.set(
@@ -161,7 +179,7 @@ tasks {
     publish {
         dependsOn(build)
     }
-    create("deploy") {
+    register("deploy") {
         group = "build"
         dependsOn(publish)
     }
