@@ -136,12 +136,6 @@ mavenPublishing {
     }
 }
 
-extra["mavenCentralUsername"] = System.getenv("NEXUS_USER")
-extra["mavenCentralPassword"] = System.getenv("NEXUS_PASS")
-extra["signingInMemoryKey"] = System.getenv("SIGNING_KEY")
-extra["signingInMemoryKeyId"] = System.getenv("SIGNING_KEY_ID")
-extra["signingInMemoryKeyPassword"] = System.getenv("SIGNING_PASSWORD")
-
 tasks {
     withType<Test> {
         reports {

@@ -29,7 +29,13 @@ jobs:
       - name: Publish
         uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: publishAndReleaseToMavenCentral
+          arguments: >
+            -PmavenCentralUsername=$NEXUS_USER
+            -PmavenCentralPassword=$NEXUS_PASS
+            -PsigningInMemoryKey=$SIGNING_KEY
+            -PsigningInMemoryKeyId=$SIGNING_KEY_ID
+            -PsigningInMemoryKeyPassword=$SIGNING_PASSWORD
+            publishAndReleaseToMavenCentral
         env:
           SIGNING_KEY_ID: ${{ secrets.OSSRH_SIGNING_KEY_ID }}
           SIGNING_KEY: ${{ secrets.OSSRH_SIGNING_SECRET_KEY_RING_FILE }}
