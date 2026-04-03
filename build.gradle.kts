@@ -5,7 +5,6 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.plugin.dokka)
-    alias(libs.plugins.plugin.dokka.javadoc)
     alias(libs.plugins.maven.publish)
 }
 
@@ -101,6 +100,15 @@ kotlin {
 mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
+
+    configure(
+        com.vanniktech.maven.publish.KotlinMultiplatform(
+            javadocJar = com.vanniktech.maven.publish.JavadocJar.Dokka(
+                "dokkaHtml"
+            )
+        )
+    )
+
     coordinates(group.toString(), "kotlin-cor", version.toString())
     pom {
         name.set("Kotlin CoR")
