@@ -103,9 +103,7 @@ mavenPublishing {
 
     configure(
         com.vanniktech.maven.publish.KotlinMultiplatform(
-            javadocJar = com.vanniktech.maven.publish.JavadocJar.Dokka(
-                "dokkaHtml"
-            )
+            javadocJar = com.vanniktech.maven.publish.JavadocJar.Dokka("dokkaGeneratePublicationHtml")
         )
     )
 
