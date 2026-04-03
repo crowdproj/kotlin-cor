@@ -36,7 +36,8 @@ jobs:
           SIGNING_PASSWORD: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
           NEXUS_USER: ${{ secrets.OSSRH_USER }}
           NEXUS_PASS: ${{ secrets.OSSRH_PASS }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.OSSRH_SIGNING_SECRET_KEY_RING_FILE }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: |
+            ${{ secrets.OSSRH_SIGNING_SECRET_KEY_RING_FILE }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.OSSRH_SIGNING_KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USER }}
