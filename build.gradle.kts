@@ -25,12 +25,6 @@ dokka {
     }
 }
 
-// build.gradle.kts
-signing {
-    sign(publishing.publications)
-}
-
-
 signing {
     val keyId = System.getenv("SIGNING_KEY_ID")
     val key = System.getenv("SIGNING_KEY")
@@ -72,11 +66,10 @@ kotlin {
         nodejs()
     }
     mingwX64()
-// Publications problem in github actions: Received status code 402 from server: Payment Requir
-//    androidNativeArm32()
-//    androidNativeArm64()
-//    androidNativeX64()
-//    androidNativeX86()
+    androidNativeArm32()
+    androidNativeArm64()
+    androidNativeX64()
+    androidNativeX86()
 
     sourceSets {
         all { languageSettings.optIn("kotlin.RequiresOptIn") }
@@ -125,16 +118,16 @@ val dokkaHtmlJar by tasks.registering(Jar::class) {
 
 publishing {
     repositories {
-        val repoHost: String = System.getenv("NEXUS_HOST") ?: "https://maven.pkg.github.com/crowdproj/kotlin-cor"
-        val repoUser: String? = System.getenv("NEXUS_USER") ?: System.getenv("GITHUB_ACTOR")
-        val repoPass: String? = System.getenv("NEXUS_PASS") ?: System.getenv("GITHUB_TOKEN")
-        if (repoUser != null && repoPass != null) {
+        val nexusHost: String = System.getenv("NEXUS_HOST") ?: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+        val nexusUser: String? = System.getenv("NEXUS_USER")
+        val nexusPass: String? = System.getenv("NEXUS_PASS")
+        if (nexusUser != null && nexusPass != null) {
             maven {
-                name = "GitHubPackages"
-                url = uri(repoHost)
+                name = "MavenCentral"
+                url = uri(nexusHost)
                 credentials {
-                    username = repoUser
-                    password = repoPass
+                    username = nexusUser
+                    password = nexusPass
                 }
             }
         }
