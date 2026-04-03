@@ -13,3 +13,4 @@ atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.32.1" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 plugin-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 plugin-dokka-javadoc = { id = "org.jetbrains.dokka-javadoc", version.ref = "dokka" }
+maven-publish = { id = "com.vanniktech.maven.publish", version = "0.36.0" }

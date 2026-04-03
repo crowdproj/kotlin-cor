@@ -6,8 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.plugin.dokka)
     alias(libs.plugins.plugin.dokka.javadoc)
-    `maven-publish`
-    signing
+    alias(libs.plugins.maven.publish)
 }
 
 group = "com.crowdproj"
@@ -23,16 +22,6 @@ dokka {
         separateInheritedMembers.set(false)
         mergeImplicitExpectActualDeclarations.set(false)
     }
-}
-
-signing {
-    val keyId = System.getenv("SIGNING_KEY_ID")
-    val key = System.getenv("SIGNING_KEY")
-    val pass = System.getenv("SIGNING_PASSWORD")
-    val isRequired = (keyId != null || key != null || pass != null)
-    setRequired(isRequired)
-    useInMemoryPgpKeys(keyId, key, pass)
-    sign(publishing.publications)
 }
 
 kotlin {
@@ -60,7 +49,6 @@ kotlin {
     wasmJs {
         browser()
         nodejs()
-//        d8() - due to a bug (CorSubChainTest:createCor, SubChainSequentialTest:parallelData
     }
     wasmWasi {
         nodejs()
@@ -110,63 +98,43 @@ kotlin {
     }
 }
 
-val dokkaHtmlJar by tasks.registering(Jar::class) {
-    description = "A Javadoc JAR containing Dokka Javadoc"
-    from(tasks.dokkaGeneratePublicationHtml.flatMap { it.outputDirectory })
-    archiveClassifier.set("javadoc")
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+    coordinates(group.toString(), "kotlin-cor", version.toString())
+    pom {
+        name.set("Kotlin CoR")
+        description.set("Chain of Responsibility Design Template Library for human readable business logic")
+        url.set("https://github.com/crowdproj/kotlin-cor")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+        developers {
+            developer {
+                name.set("Sergey Okatov")
+                email.set("sokatov@gmail.com")
+                id.set("svok")
+                organization.set("CrowdProj")
+                organizationUrl.set("https://crowdproj.com")
+                timezone.set("GMT+5")
+            }
+        }
+        scm {
+            connection.set("scm:git:git://github.com/crowdproj/kotlin-cor.git")
+            developerConnection.set("scm:git:ssh://github.com/crowdproj/kotlin-cor.git")
+            url.set("https://github.com/crowdproj/kotlin-cor")
+        }
+    }
 }
 
-publishing {
-    repositories {
-        val nexusHost: String = System.getenv("NEXUS_HOST") ?: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-        val nexusUser: String? = System.getenv("NEXUS_USER")
-        val nexusPass: String? = System.getenv("NEXUS_PASS")
-        if (nexusUser != null && nexusPass != null) {
-            maven {
-                name = "MavenCentral"
-                url = uri(nexusHost)
-                credentials {
-                    username = nexusUser
-                    password = nexusPass
-                }
-            }
-        }
-    }
-    publications {
-        withType(MavenPublication::class).configureEach {
-            artifact(dokkaHtmlJar)
-            pom {
-                name.set("Kotlin CoR")
-                description.set(
-                    "Chain of Responsibility Design Template Library for human readable business " +
-                            "logic: $name platform"
-                )
-                url.set("https://github.com/crowdproj/kotlin-cor")
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                developers {
-                    developer {
-                        name.set("Sergey Okatov")
-                        email.set("sokatov@gmail.com")
-                        id.set("svok")
-                        organization.set("CrowdProj")
-                        organizationUrl.set("https://crowdproj.com")
-                        timezone.set("GMT+5")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:git://github.com/crowdproj/kotlin-cor.git")
-                    developerConnection.set("scm:git:ssh://github.com/crowdproj/kotlin-cor.git")
-                    url.set("https://github.com/crowdproj/kotlin-cor")
-                }
-            }
-        }
-    }
-}
+extra["mavenCentralUsername"] = System.getenv("NEXUS_USER")
+extra["mavenCentralPassword"] = System.getenv("NEXUS_PASS")
+extra["signingInMemoryKey"] = System.getenv("SIGNING_KEY")
+extra["signingInMemoryKeyId"] = System.getenv("SIGNING_KEY_ID")
+extra["signingInMemoryKeyPassword"] = System.getenv("SIGNING_PASSWORD")
 
 tasks {
     withType<Test> {
@@ -174,14 +142,6 @@ tasks {
             junitXml.required.set(true)
         }
         setupTestLogging()
-    }
-
-    publish {
-        dependsOn(build)
-    }
-    register("deploy") {
-        group = "build"
-        dependsOn(publish)
     }
 }
 
@@ -203,7 +163,7 @@ fun Test.setupTestLogging() {
             override fun beforeTest(testDescriptor: TestDescriptor) {}
             override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
             override fun afterSuite(suite: TestDescriptor, result: TestResult) {
-                if (suite.parent != null) { // will match the outermost suite
+                if (suite.parent != null) {
                     val output = "Results: ${result.resultType} (${result.testCount} tests, " +
                             "${result.successfulTestCount} passed, ${result.failedTestCount} failed, " +
                             "${result.skippedTestCount} skipped)"

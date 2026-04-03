@@ -27,13 +27,12 @@ jobs:
         uses: gradle/actions/wrapper-validation@v3 # Обновлено с v1
 
       - name: Publish
-        uses: gradle/actions/setup-gradle@v3 # Заменяет устаревший gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: deploy
+          arguments: publishAndReleaseToMavenCentral
         env:
           SIGNING_KEY_ID: ${{ secrets.OSSRH_SIGNING_KEY_ID }}
           SIGNING_KEY: ${{ secrets.OSSRH_SIGNING_SECRET_KEY_RING_FILE }}
           SIGNING_PASSWORD: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
-          NEXUS_HOST: ${{ secrets.OSSRH_HOST }}
           NEXUS_USER: ${{ secrets.OSSRH_USER }}
           NEXUS_PASS: ${{ secrets.OSSRH_PASS }}

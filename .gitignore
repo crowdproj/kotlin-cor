@@ -4,3 +4,4 @@
 /build
 /kotlin-js-store/yarn.lock
 /xx
+/.env
