@@ -59,7 +59,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           tag_name: ${{ github.ref }}
-          name: ${{ env.VERSION }} Updates
+          name: Release ${{ env.VERSION }}
           body_path: changelog.txt
           draft: false
         env:
