@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.2 - Release workflow improvements
+**2026-04-04**
+
+### Changed
+- Fixed GitHub Release title extraction from CHANGELOG
+- Added debug output for troubleshooting
+- Release title now properly extracted from changelog header
+
+---
+
 ## 1.0.1 - Documentation, CI/CD and versioning improvements
 **2026-04-04**
 
