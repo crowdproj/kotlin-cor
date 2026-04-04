@@ -1,23 +1,14 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [1.0.1] - 2026-04-04
+## 1.0.1 - Documentation, CI/CD and versioning improvements
+**2026-04-04**
 
 ### Added
-- Full documentation in `docs/` directory
-  - Core Concepts (Worker, Chain, Parallel, Loop)
-  - DSL Reference with full API documentation
-  - Examples from basic to advanced usage
-  - Detailed comparison with alternatives
-  - Contributing guide
+- Full documentation in `docs/` directory (Core Concepts, DSL Reference, Examples, Comparison, Contributing)
 - README with clear niche positioning (BPMS alternative, code-first)
-- GitHub Actions workflow for automated testing (`check.yml`)
+- GitHub Actions workflow for publishing
 - `${VERSION}` placeholder in documentation
-- Git tag-based versioning (v1.0.1 → 1.0.1, 1.0.1 → 1.0.1)
+- Git tag-based versioning
 
 ### Changed
 - Version now reads from git tags via `git describe`
@@ -32,13 +23,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.0] - 2026-04-02
+## 1.0.0 - First Maven Central release
+**2026-04-02**
 
 ### Added
 - First release to Maven Central
 - Chain of Responsibility pattern implementation
 - Worker, Chain, Parallel, Loop handlers
-- Kotlin Multiplatform support (JVM, JS, Native, Wasm)
+- Kotlin Multiplatform support
 - DSL for business logic composition
 - Error handling with `except` blocks
-- Settings support for external configuration
+- Settings support
