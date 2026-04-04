@@ -36,23 +36,17 @@ jobs:
           VERSION=$(echo "$GITHUB_REF" | sed 's|refs/tags/||')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           
-          # Extract release title from CHANGELOG
-          # Format: ## 1.0.1 - Documentation, CI/CD...
-          RELEASE_TITLE=$(grep -F "$VERSION - " CHANGELOG.md | sed "s/^## $VERSION - //")
+          # Extract release title from CHANGELOG including version
+          # Format: ## 1.0.2 - Release workflow improvements
+          RELEASE_TITLE=$(grep -F "$VERSION - " CHANGELOG.md | sed 's/^## //')
           echo "RELEASE_TITLE=$RELEASE_TITLE" >> $GITHUB_ENV
           
-          # Debug output
-          echo "DEBUG: VERSION=$VERSION"
-          echo "DEBUG: RELEASE_TITLE=$RELEASE_TITLE"
-          
           # Extract changelog body for this version
-          # Get content between this version header and next --- or end of file
           awk -v ver="$VERSION" '
             $0 ~ "^## "ver" - " {found=1; next}
             found && /^---$/ {exit}
             found {print}
           ' CHANGELOG.md > changelog.txt || true
-          cat changelog.txt
 
       - name: Publish to Maven Central
         uses: gradle/actions/setup-gradle@v3
