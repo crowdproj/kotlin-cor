@@ -31,7 +31,11 @@ jobs:
         uses: gradle/actions/wrapper-validation@v3
 
       - name: Extract version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          # Extract changelog for this version
+          sed -n "/^## \[${{ env.VERSION }}\]/,/^## /p" CHANGELOG.md > changelog.txt || true
 
       - name: Publish to Maven Central
         uses: gradle/actions/setup-gradle@v3
@@ -55,8 +59,8 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           tag_name: ${{ github.ref }}
-          name: Release ${{ env.VERSION }}
-          generate_release_notes: true
+          name: ${{ env.VERSION }} Updates
+          body_path: changelog.txt
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
