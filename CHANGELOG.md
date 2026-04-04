@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.3 - OpenCode settings
+**2026-04-05**
+
+### Changed
+- OpenCode settings
+
+---
+
 ## 1.0.2 - Release workflow improvements
 **2026-04-04**
 
