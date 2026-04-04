@@ -9,7 +9,16 @@ plugins {
 }
 
 group = "com.crowdproj"
-version = "1.0.0"
+
+// Version from git tag - use git describe
+val gitDescribe = providers.exec {
+    executable("git")
+    args("describe", "--tags", "--always", "--dirty", "--abbrev=0")
+}.standardOutput.asText.get().trim()
+    .removePrefix("v")
+    .ifEmpty { "unspecified" }
+
+version = gitDescribe
 
 repositories {
     mavenCentral()

@@ -1,22 +1,25 @@
-name: 'CI-publish'
+name: 'Publish'
 
 on:
-  release:
-    types: [ created ]
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
   publish:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4 # Обновлено с v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4 # Обновлено с v3
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: 'gradle' # Добавлено кэширование для ускорения
+          cache: 'gradle'
 
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1
@@ -24,9 +27,12 @@ jobs:
           chrome-version: stable
 
       - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v3 # Обновлено с v1
+        uses: gradle/actions/wrapper-validation@v3
 
-      - name: Publish
+      - name: Extract version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Publish to Maven Central
         uses: gradle/actions/setup-gradle@v3
         with:
           arguments: publishAndReleaseToMavenCentral
@@ -42,3 +48,14 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USER }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASS }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref }}
+          name: Release ${{ env.VERSION }}
+          generate_release_notes: true
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

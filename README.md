@@ -1,157 +1,84 @@
 [![Download](https://img.shields.io/maven-central/v/com.crowdproj/kotlin-cor)](https://search.maven.org/artifact/com.crowdproj/kotlin-cor)
+[![License](https://img.shields.io/github/license/crowdproj/kotlin-cor)](LICENSE)
 
-# Kotlin Chain of Responsibility Design Pattern Library
+# kotlin-cor — Chain of Responsibility for Business Logic
 
-## Description
+**kotlin-cor** is a lightweight Kotlin Multiplatform library that brings Chain of Responsibility pattern to business logic orchestration. It allows you to write complex business processes as readable, declarative code — instead of XML schemas or visual BPM designers.
 
-This is a Chain of Responsibility (CoR) Design Pattern Library. Its goal is to make business logics as simple as ...:
+## Niche & Purpose
+
+kotlin-cor fills the gap between simple CoR pattern and full-blown workflow engines:
+
+| Category | Tools | kotlin-cor Role |
+|----------|-------|-----------------|
+| **State Machines** | Tinder/StateMachine, KStateMachine | Different — sequential processing, not state transitions |
+| **Workflow Engines** | Temporal, Infinitic, Conductor | Lighter alternative — no infrastructure needed |
+| **Saga Pattern** | Arrow Saga | Different — sequential pipeline, not distributed transactions |
+| **BPMS** | Camunda, Flowable | **Direct competitor** — code-first instead of visual-first |
+
+**Primary Use Cases:**
+- Request handling pipelines (validation → authorization → processing → response)
+- Business logic in microservices without external orchestration
+- Projects requiring Kotlin Multiplatform (JVM + JS + Native)
+- Teams wanting version control over business logic
+
+## Competitive Advantages
+
+1. **Code-first** — Business logic in Kotlin, not XML/BPMN
+2. **No infrastructure** — Just a library, no external servers
+3. **KMP** — Single codebase for all platforms (JVM, JS, Native, Wasm)
+4. **Readable** — Chain reads like documentation
+5. **Extensible** — Easy to add custom handlers
+
+See [docs/comparison.md](docs/comparison.md) for detailed analysis.
+
+## Quick Example
 
 ```kotlin
-val bizLogics = rootChain<BizContext> {
-    initialize("Initialization of the chain")
-    chooseRepo("Choose test of prod repository")
-    validation("Validation of the request") {
-        validateIdNotEmpty("Validate the id to be not empty")
-        validateIdFormat("Validate the id to have proper format")
-        finishValidateion("Prepare response on errors")
+val chain = rootChain<BizContext> {
+    validate("Validate request") {
+        validateNotEmpty("Check ID not empty")
+        validateFormat("Check ID format")
     }
-    readObject("Reading requested object")
-    access("Check access rights") {
-        accessRelations("Compute relationships of the requester to the object")
-        accessCorPermissions("Compute permissions of the user to the object")
-        accessValidate("Check the requested operation is permitted")
-        accessFrontedPeremissions("Compute the user permissions to deliver to frontend")
+    authorize("Check access rights") {
+        fetchUserPermissions()
+        checkObjectAccess()
     }
-    response("Prepare response")
+    fetchData("Load business object")
+    respond("Prepare response")
 }.build()
-val ctx = BizContext(
-    idRequested = "<Object id from request obtained in controller>"
-)
-bizLogics.exec(ctx)
-assertEquals(expected, ctx.objResponse)
+
+runBlocking { chain.exec(BizContext(request)) }
 ```
 
-Other option includes also custom settings of the pipeline that can be used during initialization and processing:
+## Key Features
 
-```kotlin
-val settings = BizSettings(
-    repo = PostgresRepo(),
-    loggerProvider = { clazz: String -> LoggerFactory.getLogger(clazz) },
-)
-val bizLogics = rootChain<BizContext, CorSettings>(settings) {
-    readObject("Object reading from DB")
-}
-fun ICorDslAdd<BizContext, BizSettings>.readObject(title: String) = worker {
-    this.title = title
-    this.description = """
-     This worker handles reading object in question from DB.
-     The mandatory parameter is ID
-   """
-    // Getting content of BizSettings to this.config, 
-    // so that logger initialized during configuration step
-    val logger = this.config.loggerProvider("readObject")
-    on { state == RUNNING }
-    handle {
-        // But we can use logger in runtime area
-        logger.info("Handling $title")
-        objectRead = config.repo.read(this.toReadRequest())
-    }
-    except { e: Throwable ->
-        fail(e.toError())
-        logger.error("Error reading object from DB", e)
-    }
-}
-```
-
-Such a representation of the business logics has the following advantages.
-
-1. It is optimized for human readability. So, any developer will easily find the required operation.
-2. It is extremely agile and allows easy change of the business process without substantial refactoring.
-3. Provides "code first" approach that better suits the needs of developers.
-
-### CoR vs BPMS
-
-BPMS engines provide a "declaration first" approach where business logics is developed in a visual designer. This
-may be very convenient for analysts, architects or managers but brings few disadvantages to developers. The main problem
-is current engines use a schema: Visual Editor -> xml spec -> code.
-
-1. This means that developers do not control the code. Any change by an analyst to BPM schema may break your application
-   and bring a headache to the developer.
-2. Autogenerated XML file is also severe and its manual change is problematic.
-3. This prevents parallel development of the business processes since git-conflicts cannot be easily resolved.
-
-This CoR library doesn't compete with BPM as is. But it allows developers to control the code themselves.
-
-Compatibility between BPM code generators and CoR is planned.
+- **Human-readable** — business logic reads like a specification
+- **Kotlin Multiplatform** — JVM, JS, Native, Wasm
+- **Condition-based execution** — `on { condition }` for conditional steps
+- **Error handling** — `except` blocks for compensation/rollback
+- **Parallel execution** — `parallel` block for concurrent operations
+- **Settings support** — external configuration injection
 
 ## Installation
 
-#### **`libs.versions.toml`**
-```toml
-[libraries]
-cor = "com.crowdproj:kotlin-cor:1.0.0"
-```
-
-#### **`build.gradle.kts`**
-
 ```kotlin
-repositories {
-    mavenCentral()
-}
-
+// build.gradle.kts
 dependencies {
-    implementation(libs.cor)
+    implementation("com.crowdproj:kotlin-cor:${VERSION}")
 }
 ```
 
-## Usage
+## Documentation
 
-First, build a business chain
+- [Overview](docs/index.md)
+- [Core Concepts](docs/concepts.md) — Worker, Chain, Parallel, Loop
+- [DSL Reference](docs/dsl.md)
+- [Examples](docs/examples.md)
+- [Contributing](docs/contributing.md)
 
-```kotlin
-val chain = rootChain<TestContext> {
-    // This is a simple worker
-    worker {
-        title = "Status initialization"
-        description = "Check the status initialization at the buziness chain start"
+## Status
 
-        on { status == CorStatuses.NONE }
-        handle { status = CorStatuses.RUNNING }
-        except { status = CorStatuses.FAILING }
-    }
-
-    // Chain wraps a series of workers
-    chain {
-        on { status == CorStatuses.RUNNING }
-
-        worker(
-            title = "Lambda worker",
-            description = "Example of a buziness chain worker in a lambda form"
-        ) {
-            some += 4
-        }
-    }
-
-    // Nearly the same as `chain` but workers executed in parallel, so the order between them is not guaranteed
-    parallel {
-        on {
-            some < 15
-        }
-
-        worker(title = "Increment some") {
-            some++
-        }
-    }
-    // You can represent your workers and chains as Kotlin extensions
-    // In this form they look more compact and easier
-    printResult()
-
-}.build()
-```
-
-Then start it with you context:
-
-```kotlin
-val ctx = TestContext(some = 13)
-runBlocking { chain.exec(ctx) }
-```
+- **Version**: ${VERSION}
+- **Kotlin**: 2.3.20
+- **Platforms**: JVM, JS, Linux, iOS, macOS, tvOS, watchOS, Wasm, Windows, Android Native
